@@ -1,4 +1,3 @@
-
 // 2-module logger code by Edward Mallon - modified 2023 for the e360 course at Northwestern University
 // https://thecavepearlproject.org/2023/12/01/the-e360-a-classroom-data-logger-for-science/
 /*
@@ -75,6 +74,11 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 //#define readD7resistorwD8pullup_2byte    // NTC // 2-bytes:ohms // for explanation of the method for reading analog resistance with digital pins see
 //#define readD6ResistorwD8pullup_2byte    // LDR // 2-bytes:ohms // https://thecavepearlproject.org/2019/03/25/using-arduinos-input-capture-unit-for-high-resolution-sensor-readings/
                                            // these have to match the connections shown in the build: https://thecavepearlproject.org/2023/12/01/the-e360-a-classroom-data-logger-for-science/
+                                           // LDR typical: 100 lux (Bright room) 1.5KΩ, 1000lux [Overcast day] ~300 Ω, 10,000lux (Full daylight) ~100Ω
+
+//#define readAnalogPinA3_2byteRaw         // 2-byteInt: stored as millivolts &  automatically enalbes CurrentBattery for voltage calculation
+//#define readAnalogPinA3_1byte            // index compressed resolution is only 16mv, and MAX voltage overflows beyond 4064mv
+
 //Light/Lux sensor:
 //#define readBh1750_LUX_2byte             // 2-bytes: NOTE: raw sensor output gets converted to Lux during download
 
@@ -103,9 +107,9 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 #define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
 #define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
 
-// If saving to an external 32k I2C EEprom module: 
-//#define EEpromI2Caddr 0x50                  // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
-//#define totalBytesOfStorage 32768           // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
+// If saving to an external 32k I2C EEprom module like that shown on the blog page: 
+//#define EEpromI2Caddr 0x50
+//#define totalBytesOfStorage 32768
 
 // NOTE: r9_b10_g11_gnd12 is the DEFAULT on the e360 logger for the Pulse Width Modulation lab
 // the Red LED on D13 gets used if BOTH of the following LED #define statements are commented out
@@ -139,9 +143,6 @@ bool displayMoreOptions = false;              // Flag toggle between Setup and R
 const char compileDate[] PROGMEM = __DATE__;  //  built-in function in C++ makes text string: Jun 29 2023
 const char compileTime[] PROGMEM = __TIME__;  //  built-in function in C++ makes text string: 10:04:18
 
-#define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
-#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
-// If adding 32k I2C EEprom Module: use 0x50 & 32768      for 64k eeprom (soldered on top of 4k) usually at 0x50 & 65536 with no address pins pulled high
 uint8_t sensorBytesPerRecord = 0;             // INCREMENTED at the beginning of setup to match #defined sensors. MUST divide evenly into EEprom Page buffer AND fit inside I2C buffer
 uint32_t EEmemPointer = 0;                   // a counter that advances through the EEprom memory locations by sensorBytesPerRecord at each pass through the main loop //first 64 bytes eeprom are reserved for parameter backup
 
@@ -221,6 +222,14 @@ uint32_t d3_INT1_elapsedSeconds = 0; // not saved, but calculated for specific l
   #define referenceResistorValue 32768UL    //  ARBITRARY value that should be 'close' to actual ohms but precise is not required  //https://hackingmajenkoblog.wordpress.com/2016/08/12/measuring-arduino-internal-pull-up-resistors/
   volatile boolean triggered;               //  volatiles needed for all digital pin reading of resistance:        
   volatile uint16_t timer1CounterValue;     //  prepareForInterrupts(), ISR (TIMER1_OVF_vect), ISR (TIMER1_CAPT_vect), ReadD6riseTimeOnD8
+#endif
+
+#if defined(readAnalogPinA3_2byteRaw) || defined(readAnalogPinA3_1byte)
+//------------------------------------------------------------------
+// could divide by 16 to use only one byte = >>4; but resolution falls to 16mv
+// & upper voltage capped at 4080mv but offset and store same as rail voltages?
+// doesent make sense here because we could read down to zero
+uint16_t pinA3voltage=0;                      // stored as millivolts &  requries CurrentBattery for calculation
 #endif
 
 #ifdef readBh1750_LUX_2byte 
@@ -326,6 +335,13 @@ void setup () {
   #endif
   #ifdef readD6ResistorwD8pullup_2byte
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            //  two-byte integer: LDR ohms
+  #endif
+
+  #ifdef readAnalogPinA3_2byteRaw 
+    sensorBytesPerRecord+=2;                                    //  two-byte integer: A3 pin voltage in MV
+  #endif
+  #ifdef readAnalogPinA3_1byte 
+    sensorBytesPerRecord++;                                     //  one-byte compressed: A3 pin voltage capped at 4064mv
   #endif
 
   #ifdef readBh1750_LUX_2byte
@@ -870,7 +886,8 @@ turnOffAllindicatorLEDs();
     turnOffAllindicatorLEDs();
 //--------END of RTC activity-----------------
 
-#ifdef logCurrentBattery_2byte                              // ADC reads use significant power - only read CurrentBat if saving the data
+// ADC reads use power/time so only check CurrentBat if using or saving the data
+#if defined(logCurrentBattery_2byte)  || defined(logCurrentBattery_2byteRaw) || defined(readAnalogPinA3_2byteRaw) || defined(readAnalogPinA3_1byte)
     CurrentBattery = readRailVoltage();                   // Note: a SLEEP_15MS is embedded in the readRailVoltage function, processor draws about 1mA in sleep mode ADC
     if(ECHO_TO_SERIAL){
         Serial.print(F(", Current Bat[mV]:"));Serial.print(CurrentBattery);Serial.flush();
@@ -919,12 +936,27 @@ turnOffAllindicatorLEDs();
 #endif
 
 #ifdef readD6ResistorwD8pullup_2byte   
-//-------------------
+//------------------------------------
   D6resistor_NewReading = ReadD6riseTimeOnD8();
   D6resistor_NewReading = (referenceResistorValue * D6resistor_NewReading) / uint32_Buffer;
       if(ECHO_TO_SERIAL){
         Serial.print(F(" D6[Ω]:"));Serial.print(D6resistor_NewReading);Serial.flush();
       }  
+#endif
+
+#if defined(readAnalogPinA3_2byteRaw) || defined(readAnalogPinA3_1byte)
+//---------------------------------------------------------------------
+  power_adc_enable();
+  ADMUX = default_ADMUX; ADCSRA = default_ADCSRA;
+  //all ADC readings set to default 64 (default) prescalar in setup @ 8MHz/64 = 125 kHz, =~104uS
+  bitSet(ADCSRA,ADSC); // trigger a throw-away ADC reading to engauge the Aref cap // 1st read takes 20 ADC clock cycles instead of usual 13  
+  LowPower.powerDown(SLEEP_30MS, ADC_ON, BOD_OFF); // Aref cap settling usually needs ~5 milliseconds
+  bitSet(ADCSRA,ADSC); while(bit_is_set(ADCSRA,ADSC)); uint16_Buffer = ADC; //reads ADC into uint16_Buffer
+  ADCSRA = 0; power_adc_disable();
+  // Convert the raw Analog Pin reading to a voltage
+  floatBuffer = CurrentBattery; // currentBat is in millivolts - so already multiplied by 1000
+  pinA3voltage = (float)uint16_Buffer * (floatBuffer / 1023.0); // in millivolts
+  if(ECHO_TO_SERIAL){Serial.print(F(", A3[mv]: "));Serial.println(pinA3voltage);Serial.flush();}
 #endif
 
 #ifdef readBh1750_LUX_2byte
@@ -1180,6 +1212,21 @@ turnOffAllindicatorLEDs();
   byteBuffer2   = uint32_Buffer & 0b11111111;         //highByte
     Wire.write(byteBuffer2);
 #endif // #ifdef readD6ResistorwD8pullup_2byte
+
+#ifdef readAnalogPinA3_2byteRaw                       // converted reading in millivolts
+  if (pinA3voltage==65535){pinA3voltage=65534;}       // Trap 0xFF to preserve EOF
+  loByte = lowByte(pinA3voltage);
+        Wire.write(loByte);
+  hiByte = highByte(pinA3voltage);
+        Wire.write(hiByte);        
+#endif
+
+#ifdef readAnalogPinA3_1byte                         // index compression capped to 4064 millivolts
+  uint16_Buffer = pinA3voltage >>4;                  // same as /16
+  byteBuffer1 = lowByte(uint16_Buffer);
+  if(byteBuffer1==255){byteBuffer1=254;}             // Trapping 0xFF to preserve End of Data check in startMenu_sendOPDreadings2Serial
+        Wire.write(byteBuffer1);
+#endif
 
 #ifdef readBh1750_LUX_2byte
 //-------------------------
@@ -1832,6 +1879,12 @@ void startMenu_listEnabledSensors(){
   #ifdef readD6ResistorwD8pullup_2byte // e360
       Serial.print(F("D6[Ω], "));
       #endif  
+  #ifdef readAnalogPinA3_2byteRaw
+        Serial.print(F("A3[mv]2byte, "));
+        #endif
+  #ifdef readAnalogPinA3_1byte
+        Serial.print(F("A3[mv]1byte, "));
+        #endif 
   #ifdef readBh1750_LUX_2byte
         Serial.print(F("Bh1750[Lux], "));
         #endif
@@ -2210,6 +2263,22 @@ if (!convertDataFlag){    // then output raw bytes exactly as read from eeprom [
       uint16_Buffer = (uint16_t)((hiByte << 8) | loByte); 
       Serial.print(uint16_Buffer);Serial.print(F(","));
 #endif
+
+#ifdef readAnalogPinA3_2byteRaw                 // stored as millivolts &  requries CurrentBattery for calculation 
+      loByte = i2c_eeprom_read_byte(EEpromI2Caddr,EEmemPointer);
+      EEmemPointer++;             
+      hiByte = i2c_eeprom_read_byte(EEpromI2Caddr,EEmemPointer);
+      EEmemPointer++;                   
+      uint16_Buffer = (uint16_t)((hiByte << 8) | loByte); 
+      Serial.print(uint16_Buffer);Serial.print(F(","));
+#endif
+#ifdef readAnalogPinA3_1byte                    // stored as millivolts &  requries CurrentBattery for calculation 
+      uint16_Buffer = i2c_eeprom_read_byte(EEpromI2Caddr,EEmemPointer);
+      EEmemPointer++;
+      uint16_Buffer = uint16_Buffer<<4;         // REVERSING the division we used to compress the reading into one byte (note <<4 is the same as *16)
+      Serial.print(uint16_Buffer);Serial.print(F(","));
+#endif
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // STEP6 : following the pattern shown directly ABOVE extract the sensor bytes from the EEprom
