@@ -760,7 +760,7 @@ RTC_DS3231_getTime();                     // populates the global variables t_da
   uint32_Buffer += 946684800;               // this will be the unixtime when we wake AFTER the sync delay is over // add # seconds from 1970 to 2000 = delta between Unixtime start & our RTC's internal start time
   EEPROM.put(0,uint32_Buffer);              // store loggerStartTime so it can be used reconstructing each records timestamp in the startMenu_sendData2Serial() later during download
 
-  #ifdef PIRtriggersReadings_4byte
+  #if defined(PIRtriggersReadings_4byte) || defined(TTP223triggersReadings_4byte)
     previousD3triggerTime = uint32_Buffer;
   #endif
 
