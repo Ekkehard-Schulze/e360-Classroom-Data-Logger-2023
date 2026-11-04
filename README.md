@@ -1,4 +1,18 @@
 ![banner image](https://github.com/EKMallon/The-e360-Student-Built-Data-Logger/assets/7884030/48f75f8c-3236-4a68-9ae2-6572afddc3ce)
+
+# e360 Classroom Data Logger (TMP117 & ADT7420 Fork)
+
+This repository is a fork of EKMallon's [e360-Classroom-Data-Logger-2023](https://github.com). All original credits belong to the initial author.
+
+## Purpose of this Fork
+The primary goal of this fork is to add support and implementation code for the following temperature sensors:
+* **TMP117**
+* **ADT7420**
+
+## Disclaimer
+⚠️ **Important Notice:** Only basic tests have been performed so far. This code is provided as-is. Use it entirely at your own risk and responsibility.
+
+
 This program supports an ongoing series of DIY 'Classroom Logger' tutorials from Edward Mallon & Dr. Patricia Beddows at the Cave Pearl Project. The idea is to provide a starting point for student projects in environmental monitoring courses and/or thesis level research.</br>
 The tutorial for this logger: [The e360: A Classroom Data Logger for Science](https://thecavepearlproject.org/2023/12/01/the-e360-a-10-classroom-data-logger-for-science/)</br>
 has a companion video [2-Module Data Logger Build Video (90min w Commentary)](https://youtu.be/_LEFM4l9m5c)
