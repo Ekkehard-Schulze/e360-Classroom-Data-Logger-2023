@@ -5,6 +5,7 @@ This repository is a fork of EKMallon's [e360-Classroom-Data-Logger-2023](https:
 ## Purpose of this Fork
 The primary goal of this fork is to add support and implementation code for the following temperature sensors:
 * **TMP117**
+* **TMP119**
 * **ADT7420**
 
 ## Disclaimer regarding the Fork
