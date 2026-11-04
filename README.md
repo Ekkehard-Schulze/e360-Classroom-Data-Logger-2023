@@ -7,11 +7,13 @@ The primary goal of this fork is to add support and implementation code for the 
 * **TMP117**
 * **ADT7420**
 
-## Disclaimer
+## Disclaimer regarding the Fork
 ⚠️ **Important Notice:** Only basic tests have been performed so far. This code is provided as-is. Use it entirely at your own risk and responsibility.
 
 
 --------------------------
+
+
 
 ![banner image](https://github.com/EKMallon/The-e360-Student-Built-Data-Logger/assets/7884030/48f75f8c-3236-4a68-9ae2-6572afddc3ce)
 
