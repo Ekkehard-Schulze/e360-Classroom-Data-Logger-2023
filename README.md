@@ -1,6 +1,6 @@
 ## e360 Classroom Data Logger (TMP117, TMP119 & ADT7420 Fork)
 
-This repository is a fork of EKMallon's [e360-Classroom-Data-Logger-2023](https://github.com/EKMallon/e360-Classroom-Data-Logger-2023). All credits belong to the initial author.
+This repository is a fork of Edward K. Mallon's [e360-Classroom-Data-Logger-2023](https://github.com/EKMallon/e360-Classroom-Data-Logger-2023). All credits belong to the initial author.
 
 The aim of this fork is to add support for the following precision temperature sensors:
 * **TMP117**
