@@ -1,4 +1,4 @@
-# e360 Classroom Data Logger (Precision Temperature Fork)
+## e360 Classroom Data Logger (Precision Temperature Fork)
 
 This repository is a fork of Edward K. Mallon's [e360-Classroom-Data-Logger-2023](https://github.com). All credits for the foundational logger framework, hardware design, and core codebase belong to the initial author and the Cave Pearl Project.
 
@@ -16,7 +16,7 @@ The primary aim of this fork is to extend the original logger's capabilities by 
 ## Usage & Configuration
 
 ### Sensor Compatibility
-* **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the repective **TMP117** options in the code.
+* **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the respective **TMP117** options in the code.
 * **Dual-Sensor Support:** For the TMP117, you can deploy up to **two sensors simultaneously** on the I2C bus using addresses `0x48` and `0x49`.
 
 ### TMP117 / TMP119 Operation Modes
