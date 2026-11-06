@@ -4,7 +4,7 @@ This repository is a fork of Edward K. Mallon's [e360-Classroom-Data-Logger-2023
 
 ## Purpose of this Fork
 
-The primary aim of this fork is to extend the original logger's capabilities by adding support for high-precision I2C temperature sensors. This makes the logger suitable for applications requiring tighter thermal tolerances and calibration-grade accuracy.
+The aim of this fork is to extend the original logger's capabilities by adding support for high-precision I2C temperature sensors. This makes the logger suitable for applications requiring tighter thermal tolerances and calibration-grade accuracy.
 
 ### Supported Sensors
 * **TMP117** – High-precision digital temperature sensor ($\pm0.1^\circ\text{C}$ accuracy).
