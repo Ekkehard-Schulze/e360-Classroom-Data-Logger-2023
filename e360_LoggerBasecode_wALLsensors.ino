@@ -87,17 +87,31 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 
 //#define readSi7051_Temp_2byte            // 2-bytes: used for NTC calibration - does not require a library, functions for si7051 at end of program
 
+
 //#define readTMP117_1_Temp_2byte            // 2-bytes: 1st sensor  no averaging by es  20 ms active per read - does not require a library
 
-//#define readTMP117_1_x8_Temp_2byte          // 2-bytes: 1st sensor 8x averaging by es  300 ms active per read - does not require a library
+//#define readTMP117_1_x8_Temp_2byte         // 2-bytes: 1st sensor 8x averaging by es  300 ms active per read - does not require a library
 
-//#define readTMP117_1_x64_Temp_2byte         // 2-bytes: 1st sensor 64x averaging by es  1300 ms active per read - does not require a library
+//#define readTMP117_1_x64_Temp_2byte        // 2-bytes: 1st sensor 64x averaging by es  1300 ms active per read - does not require a library
 
 //#define readTMP117_2_Temp_2byte            // 2-bytes: 2.nd sensor no averaging by es  20 ms active per read - does not require a library
 
-//#define readTMP117_2_x8_Temp_2byte          // 2-bytes: 2. nd sensor 8x averaging by es  300 ms active per read - does not require a library
+//#define readTMP117_2_x8_Temp_2byte         // 2-bytes: 2. nd sensor 8x averaging by es  300 ms active per read - does not require a library
 
-//#define readTMP117_2_x64_Temp_2byte         // 2-bytes: 2.nd sensor 64x averaging by es  1300 ms active per read - does not require a library
+//#define readTMP117_2_x64_Temp_2byte        // 2-bytes: 2.nd sensor 64x averaging by es  1300 ms active per read - does not require a library
+
+//#define readTMP117_3_Temp_2byte            // 2-bytes: 3rd sensor  no averaging by es  20 ms active per read - does not require a library
+
+//#define readTMP117_3_x8_Temp_2byte         // 2-bytes: 3rd sensor 8x averaging by es  300 ms active per read - does not require a library
+
+//#define readTMP117_3_x64_Temp_2byte        // 2-bytes: 3rd sensor 64x averaging by es  1300 ms active per read - does not require a library
+
+//#define readTMP117_4_Temp_2byte            // 2-bytes: 4th sensor no averaging by es  20 ms active per read - does not require a library
+
+//#define readTMP117_4_x8_Temp_2byte         // 2-bytes: 4th sensor 8x averaging by es  300 ms active per read - does not require a library
+
+//#define readTMP117_4_x64_Temp_2byte        // 2-bytes: 4th sensor 64x averaging by es  1300 ms active per read - does not require a library
+
 
 //#define readADT7420_Temp_2byte            // 2-bytes: by es - does not require a library
 
@@ -321,7 +335,7 @@ uint16_t pinA3voltage=0;                      // stored as millivolts &  requrie
 #endif
 
 
-#if  defined(readTMP117_1_Temp_2byte) || defined(readTMP117_1_x8_Temp_2byte) || defined(readTMP117_1_x64_Temp_2byte) || defined(readTMP117_2_Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte)  // TMP117 definitions and helpers
+#if  defined(readTMP117_1_Temp_2byte) || defined(readTMP117_1_x8_Temp_2byte) || defined(readTMP117_1_x64_Temp_2byte) || defined(readTMP117_2_Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte) || defined(readTMP117_3_Temp_2byte) || defined(readTMP117_3_x8_Temp_2byte) || defined(readTMP117_3_x64_Temp_2byte) || defined(readTMP117_4_Temp_2byte) || defined(readTMP117_4_x8_Temp_2byte) || defined(readTMP117_4_x64_Temp_2byte)  // TMP117 definitions and helpers
 
 
 #if (defined(readTMP117_1_Temp_2byte) && defined(readTMP117_1_x8_Temp_2byte)) || \
@@ -333,6 +347,18 @@ uint16_t pinA3voltage=0;                      // stored as millivolts &  requrie
 #if (defined(readTMP117_2_Temp_2byte) && defined(readTMP117_2_x8_Temp_2byte)) || \
     (defined(readTMP117_2_Temp_2byte) && defined(readTMP117_2_x64_Temp_2byte)) || \
     (defined(readTMP117_2_x8_Temp_2byte) && defined(readTMP117_2_x64_Temp_2byte))
+#error "More than one TMP117_2 reading macro is defined!"
+#endif
+
+#if (defined(readTMP117_3_Temp_2byte) && defined(readTMP117_3_x8_Temp_2byte)) || \
+    (defined(readTMP117_3_Temp_2byte) && defined(readTMP117_3_x64_Temp_2byte)) || \
+    (defined(readTMP117_3_x8_Temp_2byte) && defined(readTMP117_3_x64_Temp_2byte))
+#error "More than one TMP117_1 reading macro is defined!"
+#endif
+
+#if (defined(readTMP117_4_Temp_2byte) && defined(readTMP117_4_x8_Temp_2byte)) || \
+    (defined(readTMP117_4_Temp_2byte) && defined(readTMP117_4_x64_Temp_2byte)) || \
+    (defined(readTMP117_4_x8_Temp_2byte) && defined(readTMP117_4_x64_Temp_2byte))
 #error "More than one TMP117_2 reading macro is defined!"
 #endif
 
@@ -497,6 +523,14 @@ void setup () {
   #if  defined(readTMP117_2_Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte) 
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
   #endif
+  
+  #if  defined(readTMP117_3_Temp_2byte) || defined(readTMP117_3_x8_Temp_2byte) || defined(readTMP117_3_x64_Temp_2byte) 
+    sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
+  #endif
+
+  #if  defined(readTMP117_4_Temp_2byte) || defined(readTMP117_4_x8_Temp_2byte) || defined(readTMP117_4_x64_Temp_2byte) 
+    sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
+  #endif  
 
   #ifdef readADT7420_Temp_2byte
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
@@ -807,6 +841,23 @@ Wire.beginTransmission(TMP117_2_ADDRESS);
   }
 #endif
 
+#if  defined(readTMP117_3_Temp_2byte) || defined(readTMP117_3_x8_Temp_2byte) || defined(readTMP117_3_x64_Temp_2byte)   // init Sensor 1
+Wire.beginTransmission(TMP117_3_ADDRESS);
+  if (Wire.endTransmission() == 0) {
+	// shutdown 
+	I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00000100, 0b00100000);
+	Serial.print(F("TMP117 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+  }
+#endif
+
+#if  defined(readTMP117_4_Temp_2byte) || defined(readTMP117_4_x8_Temp_2byte) || defined(readTMP117_4_x64_Temp_2byte)   // init Sensor 2
+Wire.beginTransmission(TMP117_4_ADDRESS);
+  if (Wire.endTransmission() == 0) {
+	// shutdown 
+	I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00000100, 0b00100000);
+	Serial.print(F("TMP117 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+  }
+#endif
 
 #ifdef readADT7420_Temp_2byte  // init Sensor
 Wire.beginTransmission(ADT7420_ADDRESS);
@@ -1292,7 +1343,7 @@ Wire.endTransmission();
     tmp117_1_datac = ((tmp117_1_data[0] << 8) | tmp117_1_data[1]); 
 
     // Convert to Celcius (7.8125 mC resolution)
-	Serial.print(F(", TMP117 temp: "));Serial.print(tmp117_1_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+	Serial.print(F(", TMP1 temp: "));Serial.print(tmp117_1_datac * 0.0078125,2);Serial.flush();//print 3 decimals
   }
 // end read TMP117 -------------------
 #endif
@@ -1371,11 +1422,167 @@ Wire.endTransmission();
     tmp117_2_datac = ((tmp117_2_data[0] << 8) | tmp117_2_data[1]); 
 
     // Convert to Celcius (7.8125 mC resolution)
-	Serial.print(F(", TMP117 temp: "));Serial.print(tmp117_2_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+	Serial.print(F(", TMP2 temp: "));Serial.print(tmp117_2_datac * 0.0078125,2);Serial.flush();//print 3 decimals
   }
 // end read TMP117 -------------------
 #endif
 
+// ---------- third TMP117 sensor
+#if  defined(readTMP117_3_Temp_2byte) || defined(readTMP117_3_x8_Temp_2byte) || defined(readTMP117_3_x64_Temp_2byte)  // read and print
+
+#ifdef readTMP117_3_Temp_2byte
+// Triggers a One-Shot conversion with no averaging enabled.
+// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00000000); 
+
+// Note: A single conversion takes ~15.5 ms. 
+// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// or poll the Data_Ready (DRDY) bit before reading the temperature
+
+delay(20); // Wait safely for the 15.5ms hardware action to finish + 4.5 ms safety margin
+
+#endif
+
+#ifdef readTMP117_3_x8_Temp_2byte
+// Triggers a One-Shot conversion with 8x averaging enabled.
+// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00100000); 
+
+// Note: A single conversion takes ~15.5 ms. 
+// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// or poll the Data_Ready (DRDY) bit before reading the temperature
+
+delay(155); // Wait safely for the 124ms hardware loop to finish + 31 ms safety margin
+
+#endif
+
+#ifdef readTMP117_3_x64_Temp_2byte
+// Triggers a One-Shot conversion with 64x averaging enabled.
+// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b01100000); 
+
+// Note: A single conversion takes ~15.5 ms. 
+// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// or poll the Data_Ready (DRDY) bit before reading the temperature
+
+delay(1300); // Wait safely for the 1000ms hardware loop to finish + 3ßß ms safety margin
+
+#endif
+
+// read sensor
+// Points to device & begins transmission
+Wire.beginTransmission(TMP117_3_ADDRESS); 
+// Points to temperature register to read/write data
+Wire.write(TMP117_Temp_Reg); 
+// Ends data transfer and transmits data from register
+Wire.endTransmission(); 
+// Delay to allow sufficient conversion time, is done after the calling loop
+// delay(10);
+
+  // Data array to store 2-bytes from I2C line
+  uint8_t tmp117_3_data[2]; 
+  // Combination of 2-byte data into 16-bit data
+  int16_t tmp117_3_datac;     
+
+  // Requests 2-byte temperature data from device
+  Wire.requestFrom(TMP117_3_ADDRESS,2); 
+
+  // Checks if data received matches the requested 2-bytes
+  if(Wire.available() <= 2){  
+    // Stores each byte of data from temperature register
+    tmp117_3_data[0] = Wire.read(); 
+    tmp117_3_data[1] = Wire.read(); 
+
+    // Combines data to make 16-bit binary number
+    tmp117_3_datac = ((tmp117_3_data[0] << 8) | tmp117_3_data[1]); 
+
+    // Convert to Celcius (7.8125 mC resolution)
+	Serial.print(F(", TMP3 temp: "));Serial.print(tmp117_3_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+  }
+// end read TMP117 -------------------
+#endif
+
+
+// ---------- fourth TMP117 sensor
+#if  defined(readTMP117_4_Temp_2byte) || defined(readTMP117_4_x8_Temp_2byte) || defined(readTMP117_4_x64_Temp_2byte)  // read and print
+
+#ifdef readTMP117_4_Temp_2byte
+// Triggers a One-Shot conversion with no averaging enabled.
+// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+I2Cwrite(TMP117_4_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00000000); 
+
+// Note: A single conversion takes ~15.5 ms. 
+// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// or poll the Data_Ready (DRDY) bit before reading the temperature
+
+delay(20); // Wait safely for the 15.5ms hardware action to finish + 4.5 ms safety margin
+
+#endif
+
+#ifdef readTMP117_4_x8_Temp_2byte
+// Triggers a One-Shot conversion with 8x averaging enabled.
+// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+I2Cwrite(TMP117_4_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00100000); 
+
+// Note: A single conversion takes ~15.5 ms. 
+// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// or poll the Data_Ready (DRDY) bit before reading the temperature
+
+delay(155); // Wait safely for the 124ms hardware loop to finish + 31 ms safety margin
+
+#endif
+
+#ifdef readTMP117_4_x64_Temp_2byte
+// Triggers a One-Shot conversion with 64x averaging enabled.
+// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+I2Cwrite(TMP117_4_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b01100000); 
+
+// Note: A single conversion takes ~15.5 ms. 
+// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// or poll the Data_Ready (DRDY) bit before reading the temperature
+
+delay(1300); // Wait safely for the 1000ms hardware loop to finish + 3ßß ms safety margin
+
+#endif
+
+// read sensor
+// Points to device & begins transmission
+Wire.beginTransmission(TMP117_4_ADDRESS); 
+// Points to temperature register to read/write data
+Wire.write(TMP117_Temp_Reg); 
+// Ends data transfer and transmits data from register
+Wire.endTransmission(); 
+// Delay to allow sufficient conversion time, is done after the calling loop
+// delay(10);
+
+  // Data array to store 2-bytes from I2C line
+  uint8_t tmp117_4_data[2]; 
+  // Combination of 2-byte data into 16-bit data
+  int16_t tmp117_4_datac;     
+
+  // Requests 2-byte temperature data from device
+  Wire.requestFrom(TMP117_4_ADDRESS,2); 
+
+  // Checks if data received matches the requested 2-bytes
+  if(Wire.available() <= 2){  
+    // Stores each byte of data from temperature register
+    tmp117_4_data[0] = Wire.read(); 
+    tmp117_4_data[1] = Wire.read(); 
+
+    // Combines data to make 16-bit binary number
+    tmp117_4_datac = ((tmp117_4_data[0] << 8) | tmp117_4_data[1]); 
+
+    // Convert to Celcius (7.8125 mC resolution)
+	Serial.print(F(", TMP4 temp: "));Serial.print(tmp117_4_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+  }
+// end read TMP117 -------------------
+#endif
 
 
 #ifdef readADT7420_Temp_2byte // read and print 
@@ -1715,6 +1922,25 @@ hiByte = highByte(uint16_Buffer);
 Wire.write(hiByte);
 #endif
 
+#if  defined(readTMP117_3_Temp_2byte) || defined(readTMP117_3_x8_Temp_2byte) || defined(readTMP117_3_x64_Temp_2byte) 
+// ------------ prepare eeprom data for TMP117 -----------------------
+uint16_Buffer = (uint16_t)tmp117_3_datac;
+if(uint16_Buffer == 65535){ uint16_Buffer = 65534; } // 0xFF Trap zur Datensicherheit
+loByte = lowByte(uint16_Buffer);
+Wire.write(loByte);
+hiByte = highByte(uint16_Buffer);
+Wire.write(hiByte);
+#endif
+
+#if  defined(readTMP117_4_Temp_2byte) || defined(readTMP117_4_x8_Temp_2byte) || defined(readTMP117_4_x64_Temp_2byte) 
+// ------------ prepare eeprom data for TMP117 -----------------------
+uint16_Buffer = (uint16_t)tmp117_4_datac;
+if(uint16_Buffer == 65535){ uint16_Buffer = 65534; } // 0xFF Trap zur Datensicherheit
+loByte = lowByte(uint16_Buffer);
+Wire.write(loByte);
+hiByte = highByte(uint16_Buffer);
+Wire.write(hiByte);
+#endif
 
 #ifdef readADT7420_Temp_2byte
 // ------------ prepare eeprom data for ADT7420 -----------------------
@@ -2324,6 +2550,12 @@ void startMenu_listEnabledSensors(){
   #if  defined(readTMP117_2_Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte) 
 	    Serial.print(F("TMP2[°C], "));
 	    #endif		
+  #if  defined(readTMP117_3_Temp_2byte) || defined(readTMP117_3_x8_Temp_2byte) || defined(readTMP117_3_x64_Temp_2byte) 
+	    Serial.print(F("TMP3[°C], "));
+	    #endif		
+  #if  defined(readTMP117_4_Temp_2byte) || defined(readTMP117_4_x8_Temp_2byte) || defined(readTMP117_4_x64_Temp_2byte) 
+	    Serial.print(F("TMP4[°C], "));
+	    #endif		
   #ifdef readADT7420_Temp_2byte
 	    Serial.print(F("ADT1[°C], "));
 	    #endif		
@@ -2828,6 +3060,20 @@ if (!convertDataFlag){    // then output raw bytes exactly as read from eeprom [
 #endif
 
 #if  defined(readTMP117_2_Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte) 
+		loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		int16_Buffer = (int16_t)((hiByte << 8) | loByte);
+		Serial.print(int16_Buffer * 0.0078125,2);Serial.print(F(",")); 		
+#endif
+
+#if  defined(readTMP117_3_Temp_2byte) || defined(readTMP117_3_x8_Temp_2byte) || defined(readTMP117_3_x64_Temp_2byte) 
+		loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		int16_Buffer = (int16_t)((hiByte << 8) | loByte);
+		Serial.print(int16_Buffer * 0.0078125,2);Serial.print(F(",")); 		
+#endif
+
+#if  defined(readTMP117_4_Temp_2byte) || defined(readTMP117_4_x8_Temp_2byte) || defined(readTMP117_4_x64_Temp_2byte) 
 		loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
 		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
 		int16_Buffer = (int16_t)((hiByte << 8) | loByte);

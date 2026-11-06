@@ -8,7 +8,7 @@ The aim of this fork is to extend the original logger's capabilities by adding s
 
 ### Supported Sensors
 * **TMP117** – High-precision digital temperature sensor ($\pm0.1^\circ\text{C}$ accuracy).
-* **TMP119** – Low-power, high-precision alternative (fully software-compatible with TMP117).
+* **TMP119** – Upgraded High-precision digital temperature sensor (fully software-compatible with TMP117).
 * **ADT7420** – 16-bit digital temperature sensor ($\pm0.25^\circ\text{C}$ accuracy).
 
 ---
@@ -17,7 +17,7 @@ The aim of this fork is to extend the original logger's capabilities by adding s
 
 ### Sensor Compatibility
 * **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the respective **TMP117** options in the code.
-* **Dual-Sensor Support:** For the TMP117, you can deploy up to **two sensors simultaneously** on the I2C bus using addresses `0x48` and `0x49`.
+* **Multi-Sensor Support:** For the TMP117, you can deploy up to **four sensors simultaneously** on the I2C bus using addresses `0x48`, `0x49`, `0x4A`, `0x4B`.
 
 ### TMP117 / TMP119 Operation Modes
 To balance power efficiency with data quality, you can choose from three hardware averaging modes during setup:
