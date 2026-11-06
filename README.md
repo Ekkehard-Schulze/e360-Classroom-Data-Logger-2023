@@ -8,7 +8,7 @@ The aim of this fork is to extend the original logger's capabilities by adding s
 
 ### Supported Sensors
 * **TMP117** – High-precision digital temperature sensor, accuracy not worse than ±0.1&nbsp;°C from –20&nbsp;°C to +50&nbsp;°C.
-* **TMP119** – Upgraded high-precision digital temperature sensor, accuracy ±0.03&nbsp;°C (typical) from 0&nbsp;°C to 45&nbsp;°C (fully software-compatible with TMP117).
+* **TMP119** – Upgraded high-precision digital temperature sensor, accuracy ±0.03&nbsp;°C (typical) from 0&nbsp;°C to 45&nbsp;°C.
 * **ADT7420** – 16-bit digital temperature sensor ±0.20 °C accuracy from −10°C to +85 °C.
 
 ---
