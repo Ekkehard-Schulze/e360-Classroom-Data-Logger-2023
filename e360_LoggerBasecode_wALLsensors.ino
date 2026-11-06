@@ -94,11 +94,11 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 
 //#define readTMP117_1_x64_Temp_2byte        // 2-bytes: 1st sensor 64x averaging by es  1300 ms active per read - does not require a library
 
-//#define readTMP117_2_Temp_2byte            // 2-bytes: 2.nd sensor no averaging by es  20 ms active per read - does not require a library
+//#define readTMP117_2_Temp_2byte            // 2-bytes: 2nd sensor no averaging by es  20 ms active per read - does not require a library
 
-//#define readTMP117_2_x8_Temp_2byte         // 2-bytes: 2. nd sensor 8x averaging by es  300 ms active per read - does not require a library
+//#define readTMP117_2_x8_Temp_2byte         // 2-bytes: 2nd sensor 8x averaging by es  300 ms active per read - does not require a library
 
-//#define readTMP117_2_x64_Temp_2byte        // 2-bytes: 2.nd sensor 64x averaging by es  1300 ms active per read - does not require a library
+//#define readTMP117_2_x64_Temp_2byte        // 2-bytes: 2nd sensor 64x averaging by es  1300 ms active per read - does not require a library
 
 //#define readTMP117_3_Temp_2byte            // 2-bytes: 3rd sensor  no averaging by es  20 ms active per read - does not require a library
 
