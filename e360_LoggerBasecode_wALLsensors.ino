@@ -87,9 +87,13 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 
 //#define readSi7051_Temp_2byte            // 2-bytes: used for NTC calibration - does not require a library, functions for si7051 at end of program
 
-//#define readTMP117_Temp_2byte            // 2-bytes: by es
+//#define readTMP117_Temp_2byte            // 2-bytes: no averaging by es  20 ms active per read - does not require a library
 
-//#define readADT7420_Temp_2byte            // 2-bytes: by es
+//#define readTMP117x8_Temp_2byte          // 2-bytes: 8x averaging by es  300 ms active per read - does not require a library
+
+//#define readTMP117x64_Temp_2byte         // 2-bytes: 64x averaging by es  1300 ms active per read - does not require a library
+
+//#define readADT7420_Temp_2byte            // 2-bytes: by es - does not require a library
 
 //#define readSht3x_Temp_2byte             // 2-bytes
 //#define readSht3x_Humidity_2byte         // 2-bytes
@@ -311,9 +315,7 @@ uint16_t pinA3voltage=0;                      // stored as millivolts &  requrie
 #endif
 
 
-#ifdef readTMP117_Temp_2byte
-
-// TMP117 definitions and helpers
+#if  defined(readTMP117_Temp_2byte) || defined(readTMP117x8_Temp_2byte) || defined(readTMP117x64_Temp_2byte)   // TMP117 definitions and helpers
 
 #define TMP117_ADDRESS     0x48             // I2C address of sensor, 0x48, 0x49, 0x4A, 0x4B
 const int TMP117_Temp_Reg = 0x00;           // Temperature register
@@ -344,13 +346,9 @@ double I2Cwrite(int dev, int reg, int H, int L){
 #define ADT7420_REG_CONFIG  0x03
 #define ADT7420_REG_TEMP_H  0x00
 
-// Konfigurations-Bytes (inklusive 16-Bit-Modus über Bit 7 = 1)
-#define ADT7420_16BIT_MODE_SHUTDOWN 0xE0 // Binär: 1110 0000 (Bit 7 = 1, Bits [6:5] = 11)
-#define ADT7420_16BIT_MODE_ONESHOT  0xA0 // Binär: 1010 0000 (Bit 7 = 1, Bits [6:5] = 01)
-
-// Konfigurations-Bytes
-//#define ADT7420_MODE_SHUTDOWN 0x60 // Bits [6:5] = 11 für Shutdown (Sleep)
-//#define ADT7420_MODE_ONESHOT  0x20 // Bits [6:5] = 01 für One-Shot-Konvertierung
+// Konfigurations-Bytes (16-Bit-Modus über Bit 7 = 1)
+#define ADT7420_16BIT_MODE_SHUTDOWN 0b11100000 // (Bit 7 = 1, Bits [6:5] = 11)
+#define ADT7420_16BIT_MODE_ONESHOT  0x10100000 // (Bit 7 = 1, Bits [6:5] = 01)
 
 float adt7420_float;
 short adt7420_short;
@@ -366,11 +364,7 @@ void adt7420_control (uint8_t i2caddr, uint8_t cvalue)
     	Wire.write((uint8_t)cvalue); // value
     	Wire.endTransmission();
     }
-
-
 #endif
-
-
 
 
 
@@ -473,7 +467,7 @@ void setup () {
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
   #endif
   
-  #ifdef readTMP117_Temp_2byte
+  #if  defined(readTMP117_Temp_2byte) || defined(readTMP117x8_Temp_2byte) || defined(readTMP117x64_Temp_2byte) 
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
   #endif
 
@@ -768,18 +762,11 @@ Serial.print(F("Initializing sensors: "));Serial.flush();
 #endif
 
 
-#ifdef readTMP117_Temp_2byte  // init Sensor
+#if  defined(readTMP117_Temp_2byte) || defined(readTMP117x8_Temp_2byte) || defined(readTMP117x64_Temp_2byte)   // init Sensor
 Wire.beginTransmission(TMP117_ADDRESS);
   if (Wire.endTransmission() == 0) {
-   // Sets 8x averaging and triggers a One-Shot conversion
-	// Triggers a One-Shot conversion with 8x averaging enabled.
-	// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-	// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
-	I2Cwrite(TMP117_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00100000); 
-
-	// Note: A single conversion takes ~15.5 ms. 
-	// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
-	// or poll the Data_Ready (DRDY) bit before reading the temperature.
+	// shutdown 
+	I2Cwrite(TMP117_ADDRESS, TMP117_Config_Reg, 0b00000100, 0b00100000);
 	Serial.print(F("TMP117 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
   }
 #endif
@@ -790,9 +777,9 @@ Wire.beginTransmission(TMP117_ADDRESS);
 #ifdef readADT7420_Temp_2byte  // init Sensor
 Wire.beginTransmission(ADT7420_ADDRESS);
   if (Wire.endTransmission() == 0) {
-   // Sets 8x averaging and triggers a One-Shot conversion
+   // shutdown 
    adt7420_control(ADT7420_ADDRESS, ADT7420_16BIT_MODE_SHUTDOWN);
-	Serial.print(F("ADT7420 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+   Serial.print(F("ADT7420 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
   }
 #endif
 
@@ -1202,9 +1189,25 @@ turnOffAllindicatorLEDs();
 
 
 
-#ifdef readTMP117_Temp_2byte // read and print
+#if  defined(readTMP117_Temp_2byte) || defined(readTMP117x8_Temp_2byte) || defined(readTMP117x64_Temp_2byte)  // read and print
+
+#ifdef readTMP117_Temp_2byte
+// Triggers a One-Shot conversion with no averaging enabled.
+// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+I2Cwrite(TMP117_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00000000); 
+
+// Note: A single conversion takes ~15.5 ms. 
+// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// or poll the Data_Ready (DRDY) bit before reading the temperature
+
+delay(20); // Wait safely for the 15.5ms hardware action to finish + 4.5 ms safety margin
+
+#endif
 
 
+
+#ifdef readTMP117x8_Temp_2byte
 // Triggers a One-Shot conversion with 8x averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
 // LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
@@ -1215,6 +1218,26 @@ I2Cwrite(TMP117_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00100000);
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
 delay(155); // Wait safely for the 124ms hardware loop to finish + 31 ms safety margin
+
+#endif
+
+#ifdef readTMP117x64_Temp_2byte
+// Triggers a One-Shot conversion with 64x averaging enabled.
+// MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+I2Cwrite(TMP117_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b01100000); 
+
+// Note: A single conversion takes ~15.5 ms. 
+// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// or poll the Data_Ready (DRDY) bit before reading the temperature
+
+delay(1300); // Wait safely for the 1000ms hardware loop to finish + 3ßß ms safety margin
+
+#endif
+
+
+
+
 
 // read sensor
 // Points to device & begins transmission
@@ -1243,11 +1266,9 @@ Wire.endTransmission();
     // Combines data to make 16-bit binary number
     tmp117_datac = ((tmp117_data[0] << 8) | tmp117_data[1]); 
 
-    // Convert to Celcius (7.8125 mC resolution) and return
-    //return datac*0.0078125; 
+    // Convert to Celcius (7.8125 mC resolution)
 	Serial.print(F(", TMP117 temp: "));Serial.print(tmp117_datac * 0.0078125,2);Serial.flush();//print 3 decimals
   }
-
 // end read TMP117 -------------------
 #endif
 
@@ -1570,7 +1591,7 @@ turnOffAllindicatorLEDs();
 #endif //readSi7051_Temp_2byte
 
 
-#ifdef readTMP117_Temp_2byte
+#if  defined(readTMP117_Temp_2byte) || defined(readTMP117x8_Temp_2byte) || defined(readTMP117x64_Temp_2byte) 
 // ------------ prepare eeprom data for TMP117 -----------------------
 uint16_Buffer = (uint16_t)tmp117_datac;
 if(uint16_Buffer == 65535){ uint16_Buffer = 65534; } // 0xFF Trap zur Datensicherheit
@@ -1582,7 +1603,7 @@ Wire.write(hiByte);
 
 
 #ifdef readADT7420_Temp_2byte
-// ------------ prepare eeprom data for TMP117 -----------------------
+// ------------ prepare eeprom data for ADT7420 -----------------------
 uint16_Buffer = (uint16_t)adt7420_datac;
 if(uint16_Buffer == 65535){ uint16_Buffer = 65534; } // 0xFF Trap zur Datensicherheit
 loByte = lowByte(uint16_Buffer);
@@ -2183,7 +2204,7 @@ void startMenu_listEnabledSensors(){
   #ifdef readSi7051_Temp_2byte
         Serial.print(F("SI7051[°C], "));
         #endif
-  #ifdef readTMP117_Temp_2byte
+  #if  defined(readTMP117_Temp_2byte) || defined(readTMP117x8_Temp_2byte) || defined(readTMP117x64_Temp_2byte) 
 	    Serial.print(F("TMP117[°C], "));
 	    #endif		
   #ifdef readADT7420_Temp_2byte
@@ -2682,7 +2703,7 @@ if (!convertDataFlag){    // then output raw bytes exactly as read from eeprom [
         //integer converted to celcius (3 decimals output)   //or Serial.print(TEMP_si7051); to print raw integer 
 #endif // #ifdef readSi7051_Temp_2byte
 
-#ifdef readTMP117_Temp_2byte
+#if  defined(readTMP117_Temp_2byte) || defined(readTMP117x8_Temp_2byte) || defined(readTMP117x64_Temp_2byte) 
 		loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
 		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
 		int16_Buffer = (int16_t)((hiByte << 8) | loByte);
