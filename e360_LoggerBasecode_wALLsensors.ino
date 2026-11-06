@@ -2325,7 +2325,7 @@ void startMenu_listEnabledSensors(){
 	    Serial.print(F("TMP2[°C], "));
 	    #endif		
   #ifdef readADT7420_Temp_2byte
-	    Serial.print(F("ADT7420[°C], "));
+	    Serial.print(F("ADT1[°C], "));
 	    #endif		
   #ifdef PIRtriggersReadings_4byte
         Serial.print(F("PIRtrigger = Variable Runtime!"));
