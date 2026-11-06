@@ -1,11 +1,43 @@
-## e360 Classroom Data Logger (TMP117, TMP119 & ADT7420 Fork)
+# e360 Classroom Data Logger (Precision Temperature Fork)
 
-This repository is a fork of Edward K. Mallon's [e360-Classroom-Data-Logger-2023](https://github.com/EKMallon/e360-Classroom-Data-Logger-2023). All credits belong to the initial author.
+This repository is a fork of Edward K. Mallon's [e360-Classroom-Data-Logger-2023](https://github.com). All credits for the foundational logger framework, hardware design, and core codebase belong to the initial author and the Cave Pearl Project.
 
-The aim of this fork is to add support for the following precision temperature sensors:
-* **TMP117**
-* **TMP119**
-* **ADT7420**
+## 🎯 Purpose of this Fork
+
+The primary aim of this fork is to extend the original logger's capabilities by adding native support for high-precision I2C temperature sensors. This makes the logger suitable for applications requiring tighter thermal tolerances and calibration-grade accuracy.
+
+### Supported Sensors
+* **TMP117** – High-precision digital temperature sensor ($\pm0.1^\circ\text{C}$ accuracy).
+* **TMP119** – Low-power, high-precision alternative (fully software-compatible with TMP117).
+* **ADT7420** – 16-bit digital temperature sensor ($\pm0.25^\circ\text{C}$ accuracy).
+
+---
+
+## 🚀 Usage & Configuration
+
+### Sensor Compatibility
+* **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, simply select the **TMP119** option in the setup menu.
+* **Dual-Sensor Support:** For the TMP117, you can deploy up to **two sensors simultaneously** on the I2C bus using addresses `0x48` and `0x49`.
+
+### TMP117 / TMP119 Operation Modes
+To balance power efficiency with data quality, you can choose from three hardware averaging modes during setup:
+
+| Averaging Mode | Best For | Trade-off |
+| :--- | :--- | :--- |
+| **No Averaging** | Minimizing power consumption | Higher noise floor |
+| **8x Averaging** | General use / balanced logging | Moderate power draw |
+| **64x Averaging** | Maximum thermal accuracy | Higher power consumption per sample |
+
+*💡 **Tip:** If your logger is running on a CR2032 coin cell for long-term deployment, **No Averaging** is recommended to maximize battery life.*
+
+---
+
+## 🛠️ Getting Started
+
+1. Open the `.ino` file in the Arduino IDE.
+2. Ensure you have the required libraries installed for the new sensors.
+3. Open the **Serial Monitor** upon startup to access the configuration menu and select your target sensor and averaging mode.
+
 
 ## Disclaimer regarding the Fork
 ⚠️ **Important Notice:** Only basic tests have been performed so far. This code is provided as-is. Use it entirely at your own risk and responsibility.
