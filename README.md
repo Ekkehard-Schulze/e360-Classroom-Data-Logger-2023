@@ -2,7 +2,7 @@
 
 This repository is a fork of Edward K. Mallon's [e360-Classroom-Data-Logger-2023](https://github.com). All credits for the foundational logger framework, hardware design, and core codebase belong to the initial author and the Cave Pearl Project.
 
-## 🎯 Purpose of this Fork
+## Purpose of this Fork
 
 The primary aim of this fork is to extend the original logger's capabilities by adding native support for high-precision I2C temperature sensors. This makes the logger suitable for applications requiring tighter thermal tolerances and calibration-grade accuracy.
 
@@ -13,10 +13,10 @@ The primary aim of this fork is to extend the original logger's capabilities by 
 
 ---
 
-## 🚀 Usage & Configuration
+## Usage & Configuration
 
 ### Sensor Compatibility
-* **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, simply select the **TMP119** option in the setup menu.
+* **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the repective **TMP117** options in the code.
 * **Dual-Sensor Support:** For the TMP117, you can deploy up to **two sensors simultaneously** on the I2C bus using addresses `0x48` and `0x49`.
 
 ### TMP117 / TMP119 Operation Modes
@@ -31,13 +31,6 @@ To balance power efficiency with data quality, you can choose from three hardwar
 *💡 **Tip:** If your logger is running on a CR2032 coin cell for long-term deployment, **No Averaging** is recommended to maximize battery life.*
 
 ---
-
-## 🛠️ Getting Started
-
-1. Open the `.ino` file in the Arduino IDE.
-2. Ensure you have the required libraries installed for the new sensors.
-3. Open the **Serial Monitor** upon startup to access the configuration menu and select your target sensor and averaging mode.
-
 
 ## Disclaimer regarding the Fork
 ⚠️ **Important Notice:** Only basic tests have been performed so far. This code is provided as-is. Use it entirely at your own risk and responsibility.
