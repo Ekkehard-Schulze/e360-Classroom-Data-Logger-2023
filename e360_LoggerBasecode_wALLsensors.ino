@@ -93,7 +93,7 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 
 //#define readTMP117_1_x64_Temp_2byte         // 2-bytes: 1st sensor 64x averaging by es  1300 ms active per read - does not require a library
 
-//#define readTMP117_2__Temp_2byte            // 2-bytes: 2.nd sensor no averaging by es  20 ms active per read - does not require a library
+//#define readTMP117_2_Temp_2byte            // 2-bytes: 2.nd sensor no averaging by es  20 ms active per read - does not require a library
 
 //#define readTMP117_2_x8_Temp_2byte          // 2-bytes: 2. nd sensor 8x averaging by es  300 ms active per read - does not require a library
 
@@ -321,7 +321,7 @@ uint16_t pinA3voltage=0;                      // stored as millivolts &  requrie
 #endif
 
 
-#if  defined(readTMP117_1_Temp_2byte) || defined(readTMP117_1_x8_Temp_2byte) || defined(readTMP117_1_x64_Temp_2byte) || defined(readTMP117_2__Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte)  // TMP117 definitions and helpers
+#if  defined(readTMP117_1_Temp_2byte) || defined(readTMP117_1_x8_Temp_2byte) || defined(readTMP117_1_x64_Temp_2byte) || defined(readTMP117_2_Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte)  // TMP117 definitions and helpers
 
 
 #if (defined(readTMP117_1_Temp_2byte) && defined(readTMP117_1_x8_Temp_2byte)) || \
@@ -494,7 +494,7 @@ void setup () {
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
   #endif
 
-  #if  defined(readTMP117_2__Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte) 
+  #if  defined(readTMP117_2_Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte) 
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
   #endif
 
@@ -789,7 +789,7 @@ Serial.print(F("Initializing sensors: "));Serial.flush();
 #endif
 
 
-#if  defined(readTMP117_1_Temp_2byte) || defined(readTMP117_1_x8_Temp_2byte) || defined(readTMP117_1_x64_Temp_2byte)   // init Sensor
+#if  defined(readTMP117_1_Temp_2byte) || defined(readTMP117_1_x8_Temp_2byte) || defined(readTMP117_1_x64_Temp_2byte)   // init Sensor 1
 Wire.beginTransmission(TMP117_1_ADDRESS);
   if (Wire.endTransmission() == 0) {
 	// shutdown 
@@ -798,7 +798,7 @@ Wire.beginTransmission(TMP117_1_ADDRESS);
   }
 #endif
 
-#if  defined(readTMP117_2__Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte)   // init Sensor
+#if  defined(readTMP117_2_Temp_2byte) || defined(readTMP117_2_x8_Temp_2byte) || defined(readTMP117_2_x64_Temp_2byte)   // init Sensor 2
 Wire.beginTransmission(TMP117_2_ADDRESS);
   if (Wire.endTransmission() == 0) {
 	// shutdown 
