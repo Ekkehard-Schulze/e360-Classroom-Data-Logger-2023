@@ -18,7 +18,7 @@ The aim of this fork is to extend the logger's capabilities by adding support fo
 ### Sensor Compatibility
 **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the respective **TMP117** options in the code.
 
-###Multi-Sensor Support
+### Multi-Sensor Support
 
 For TMP117 and TMP119, you can deploy up to **four sensors simultaneously** on the I2C bus using addresses `0x48`, `0x49`, `0x4A`, `0x4B`.
 
