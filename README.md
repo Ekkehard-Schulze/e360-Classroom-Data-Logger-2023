@@ -4,7 +4,7 @@ This repository is a fork of Edward K. Mallon's [e360-Classroom-Data-Logger-2023
 
 ## Purpose of this Fork
 
-The aim of this fork is to extend the original logger's capabilities by adding support for high-precision I2C temperature sensors. This makes the logger suitable for applications requiring tighter thermal tolerances and calibration-grade accuracy.
+The aim of this fork is to extend the original logger's capabilities by adding support for multiple high-precision I2C temperature sensors. This makes the logger suitable for applications requiring tighter thermal tolerances and calibration-grade accuracy.
 
 ### Supported Sensors
 * **TMP117** – High-precision digital temperature sensor, accuracy not worse than ±0.1&nbsp;°C from –20&nbsp;°C to +50&nbsp;°C.
@@ -16,8 +16,11 @@ The aim of this fork is to extend the original logger's capabilities by adding s
 ## Usage & Configuration
 
 ### Sensor Compatibility
-* **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the respective **TMP117** options in the code.
-* **Multi-Sensor Support:** For the TMP117 and TMP119, you can deploy up to **four sensors simultaneously** on the I2C bus using addresses `0x48`, `0x49`, `0x4A`, `0x4B`.
+**TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the respective **TMP117** options in the code.
+
+###Multi-Sensor Support
+
+For TMP117 and TMP119, you can deploy up to **four sensors simultaneously** on the I2C bus using addresses `0x48`, `0x49`, `0x4A`, `0x4B`.
 
 ### TMP117 / TMP119 Operation Modes
 To balance power efficiency with data quality, you can choose from three hardware averaging modes during setup:
