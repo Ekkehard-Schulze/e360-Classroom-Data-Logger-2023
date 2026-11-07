@@ -1,6 +1,6 @@
 ## e360 Classroom Data Logger (Precision Temperature Fork)
 
-This repository is a fork of Edward K. Mallon's [e360-Classroom-Data-Logger-2023](https://github.com). All credits for the foundational logger framework, hardware design, and core codebase belong to the initial author and the Cave Pearl Project.
+This repository is a fork of **Edward K. Mallon's [e360-Classroom-Data-Logger-2023](https://github.com)**. All credits for the foundational logger framework, hardware design, and core codebase belong to the initial author and the Cave Pearl Project.
 
 ## Purpose of this Fork
 
