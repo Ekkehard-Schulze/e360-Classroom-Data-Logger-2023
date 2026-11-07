@@ -1,6 +1,6 @@
-# utility added by E. Schulze, updated for FT232R and CH340 interfaces
-''' Utility to download e360 Cave Pearl data logger
-Requires FT232R or CH340 USB to serial port adapter
+# utility added by E. Schulze, updated for FT232R, CH340, and CP2102 interfaces
+""" Utility to download e360 Cave Pearl data logger
+Requires FT232R, CH340, or CP2102 USB to serial port adapter
 Discovers serial port
 sends download command
 converts data to ISO8601 datetime
@@ -8,7 +8,7 @@ does some cleaning and re-naming
 converts to .tsv
 saves file
 tested on MS-Windows
-'''
+"""
 
 import time
 from datetime import UTC, datetime
@@ -24,13 +24,13 @@ OUTPUT_FILE = "cave_pearl_data.tsv"
 # USB-to-Serial identifiers
 FTDI_VID = 0x0403
 CH340_VID = 0x1A86
+CP2102_VID = 0x10C4  # Silicon Labs Vendor ID
 
 
 def find_serial_port():
-    """
-    Automatically detects a connected FT232 or CH340 USB-to-serial adapter.
+    """Automatically detects a connected FT232, CH340, or CP2102 USB-to-serial adapter.
 
-    Scans available system COM ports for standard FTDI or CH340 vendor identification
+    Scans available system COM ports for standard vendor identification
     or matching hardware description strings.
 
     Returns:
@@ -42,18 +42,27 @@ def find_serial_port():
         desc = (port.description or "").upper()
         is_ftdi = port.vid == FTDI_VID or "FT232" in desc
         is_ch340 = port.vid == CH340_VID or "CH340" in desc or "CH341" in desc
+        is_cp2102 = port.vid == CP2102_VID or "CP210" in desc
 
-        if is_ftdi or is_ch340:
-            chip_type = "FTDI (FT232)" if is_ftdi else "CH340"
-            print(f"[+] Logger detected on port: {port.device} ({port.description}) [{chip_type}]")
+        if is_ftdi or is_ch340 or is_cp2102:
+            if is_ftdi:
+                chip_type = "FTDI (FT232)"
+            elif is_ch340:
+                chip_type = "CH340"
+            else:
+                chip_type = "CP2102"
+
+            print(
+                f"[+] Logger detected on port: {port.device} ({port.description}) [{chip_type}]"
+            )
             return port.device
     return None
 
 
 def convert_unix_to_iso(line, is_header=False):
-    """
-    Parses an incoming CSV line, extracts the Unix epoch timestamp from the first column,
-    converts it into an ISO 8601 string, and converts the separator to tabs (\\t).
+    """Parses an incoming CSV line, extracts the Unix epoch timestamp from the first column,
+
+    converts it into an ISO 8601 string, and converts the separator to tabs (\t).
     Additionally removes any spaces from the column names if it is the header.
 
     Args:
@@ -85,8 +94,8 @@ def convert_unix_to_iso(line, is_header=False):
 
 
 def main():
-    """
-    Main execution loop to handle port discovery, automatic hardware reset,
+    """Main execution loop to handle port discovery, automatic hardware reset,
+
     command transmission, stream filtering, and TSV formatting.
 
     Connects to the logger, triggers data transmission, strips raw preamble metadata,
@@ -95,7 +104,7 @@ def main():
     """
     port = find_serial_port()
     if not port:
-        print("[-] No compatible FT232 or CH340 USB-serial adapter found.")
+        print("[-] No compatible FT232, CH340, or CP2102 USB-serial adapter found.")
         print("    Available ports were:")
         for p in serial.tools.list_ports.comports():
             print(f"    - {p.device}: {p.description} (VID: {p.vid}, PID: {p.pid})")
@@ -156,7 +165,9 @@ def main():
 
                 # Once data block started, identify the trailer by checking for the lack of a comma
                 if csv_started and "," not in clean_line:
-                    print("\n[+] End of data block detected (First non-CSV line encountered).")
+                    print(
+                        "\n[+] End of data block detected (First non-CSV line encountered)."
+                    )
                     break
 
                 # Process data row (convert first column and switch separator to tab)
@@ -167,12 +178,20 @@ def main():
                 f.flush()
                 saved_lines_count += 1
 
-                print(f"\r-> {saved_lines_count} lines processed and saved...", end="", flush=True)
+                print(
+                    f"\r-> {saved_lines_count} lines processed and saved...",
+                    end="",
+                    flush=True,
+                )
 
         if csv_started and saved_lines_count > 1:
-            print(f"\n\n[+] Success! Filtered data with 'Date_time' saved to '{OUTPUT_FILE}'.")
+            print(
+                f"\n\n[+] Success! Filtered data with 'Date_time' saved to '{OUTPUT_FILE}'."
+            )
         else:
-            print("\n\n[-] Error: The 'UnixTime' marker was never found or data block was empty.")
+            print(
+                "\n\n[-] Error: The 'UnixTime' marker was never found or data block was empty."
+            )
 
     except serial.SerialException as e:
         print(f"\n[-] Serial error: {e}")
