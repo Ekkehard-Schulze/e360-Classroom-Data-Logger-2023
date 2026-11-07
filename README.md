@@ -38,7 +38,7 @@ To balance power efficiency with data quality, you can choose from three hardwar
 
 A convenient Python data download tool is available at `utility/e360_CavePearl_logger_data_download.py`. 
 
-It is compatible with both **Windows** and **Linux**, and features automatic port discovery for **FT232R** (FTDI), **CP2102** and **CH340** USB-to-serial converters.
+It is compatible with both **Windows** and **Linux**, and features automatic port discovery for **FT232R** (FTDI), **CP2102** and **CH340** USB-to-serial converters. The utility converts the UNIX timestamp to ISO8601 datetime, exports data into a cleaned .tsv (Tab-Separated Values) file. Modify it according your own requirements.
 
 ## Disclaimer regarding the Fork
 ⚠️ **Important Notice:** Only basic tests have been performed so far. This code is provided as-is. Use it entirely at your own risk and responsibility.
