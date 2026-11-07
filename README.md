@@ -34,7 +34,7 @@ To balance power efficiency with data quality, you can choose from three hardwar
 *💡 **Tip:** If your logger is running on a CR2032 coin cell for long-term deployment, **No Averaging** is recommended to maximize battery life.*
 
 ---
-### 📥 Data Download Utility
+### Data Download Utility
 
 A convenient Python data download tool is available at `utility/e360_CavePearl_logger_data_download.py`. 
 
