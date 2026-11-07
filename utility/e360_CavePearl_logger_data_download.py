@@ -1,7 +1,6 @@
-# utility added by E. Schulze, only for FT232R interface
-# CH340 not implemented yet
+# utility added by E. Schulze, updated for FT232R and CH340 interfaces
 ''' Utility to download e360 Cave Pearl data logger
-Requires FT232R USB to serial port adapter
+Requires FT232R or CH340 USB to serial port adapter
 Discovers serial port
 sends download command
 converts data to ISO8601 datetime
@@ -22,15 +21,16 @@ BAUDRATE = 500000
 TIMEOUT = 2  # Seconds to wait for new data before considering the stream ended
 OUTPUT_FILE = "cave_pearl_data.tsv"
 
-# FT232 USB-to-Serial identifiers (Standard FTDI values)
+# USB-to-Serial identifiers
 FTDI_VID = 0x0403
+CH340_VID = 0x1A86
 
 
 def find_serial_port():
     """
-    Automatically detects a connected FT232 USB-to-serial adapter.
+    Automatically detects a connected FT232 or CH340 USB-to-serial adapter.
 
-    Scans available system COM ports for standard FTDI vendor identification
+    Scans available system COM ports for standard FTDI or CH340 vendor identification
     or matching hardware description strings.
 
     Returns:
@@ -38,8 +38,14 @@ def find_serial_port():
     """
     ports = serial.tools.list_ports.comports()
     for port in ports:
-        if port.vid == FTDI_VID or "FT232" in (port.description or ""):
-            print(f"[+] Logger detected on port: {port.device} ({port.description})")
+        # Check Vendor IDs or look for keywords in the description
+        desc = (port.description or "").upper()
+        is_ftdi = port.vid == FTDI_VID or "FT232" in desc
+        is_ch340 = port.vid == CH340_VID or "CH340" in desc or "CH341" in desc
+
+        if is_ftdi or is_ch340:
+            chip_type = "FTDI (FT232)" if is_ftdi else "CH340"
+            print(f"[+] Logger detected on port: {port.device} ({port.description}) [{chip_type}]")
             return port.device
     return None
 
@@ -89,7 +95,7 @@ def main():
     """
     port = find_serial_port()
     if not port:
-        print("[-] No FT232 USB-serial adapter found.")
+        print("[-] No compatible FT232 or CH340 USB-serial adapter found.")
         print("    Available ports were:")
         for p in serial.tools.list_ports.comports():
             print(f"    - {p.device}: {p.description} (VID: {p.vid}, PID: {p.pid})")
