@@ -3,7 +3,7 @@
 Requires FT232R, CH340, or CP2102 USB to serial port adapter
 Discovers serial port
 sends download command
-converts data to ISO8601 datetime (without decimal seconds)
+converts data to ISO8601 datetime
 allows timezone offset adjustments via CLI arguments
 allows custom output file naming via CLI arguments
 does some cleaning and re-naming
@@ -122,10 +122,11 @@ def main():
     # Set up Command Line Argument Parsing
     parser = argparse.ArgumentParser(description="Download and convert e360 Cave Pearl data logger data.")
     parser.add_argument(
+        "-u",    
         "--offset",
         type=float,
         default=None,
-        help="UTC hour offset designation (e.g., -5, 0, 3.5). Default is no timezone indication.",
+        help="UTC hour offset designation (e.g., -5, 0, 3). Default is no timezone indication.",
     )
     parser.add_argument(
         "-o",
