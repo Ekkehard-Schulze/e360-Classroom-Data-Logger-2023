@@ -1,17 +1,20 @@
 # utility added by E. Schulze, updated for FT232R, CH340, and CP2102 interfaces
-""" Utility to download e360 Cave Pearl data logger
+"""Utility to download e360 Cave Pearl data logger
 Requires FT232R, CH340, or CP2102 USB to serial port adapter
 Discovers serial port
 sends download command
-converts data to ISO8601 datetime
+converts data to ISO8601 datetime (without decimal seconds)
+allows timezone offset adjustments via CLI arguments
+allows custom output file naming via CLI arguments
 does some cleaning and re-naming
 converts to .tsv
 saves file
 tested on MS-Windows
 """
 
+import argparse
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 
 import serial
 import serial.tools.list_ports
@@ -19,7 +22,7 @@ import serial.tools.list_ports
 # Configuration
 BAUDRATE = 500000
 TIMEOUT = 2  # Seconds to wait for new data before considering the stream ended
-OUTPUT_FILE = "cave_pearl_data.tsv"
+DEFAULT_OUTPUT_FILE = "cave_pearl_data.tsv"
 
 # USB-to-Serial identifiers
 FTDI_VID = 0x0403
@@ -52,21 +55,20 @@ def find_serial_port():
             else:
                 chip_type = "CP2102"
 
-            print(
-                f"[+] Logger detected on port: {port.device} ({port.description}) [{chip_type}]"
-            )
+            print(f"[+] Logger detected on port: {port.device} ({port.description}) [{chip_type}]")
             return port.device
     return None
 
 
-def convert_unix_to_iso(line, is_header=False):
+def convert_unix_to_iso(line, tz_offset=None, is_header=False):
     """Parses an incoming CSV line, extracts the Unix epoch timestamp from the first column,
 
-    converts it into an ISO 8601 string, and converts the separator to tabs (\t).
+    converts it into an ISO 8601 string adjusted by a UTC hour offset, and converts the separator to tabs (\t).
     Additionally removes any spaces from the column names if it is the header.
 
     Args:
         line (str): The raw comma-separated line from the logger.
+        tz_offset (float/int, optional): The hour offset from UTC. If None, no tz suffix is added.
         is_header (bool): True if the line is the CSV header row.
 
     Returns:
@@ -81,10 +83,25 @@ def convert_unix_to_iso(line, is_header=False):
         parts[0] = "Date_time"
     else:
         try:
-            # Convert Unix epoch integer/float to ISO 8601 string (UTC)
+            # First extract base time in UTC
             unix_time = float(parts[0])
-            dt = datetime.fromtimestamp(unix_time, tz=UTC)
-            parts[0] = dt.isoformat()
+            dt_utc = datetime.fromtimestamp(unix_time, tz=UTC)
+            dt_utc = dt_utc.replace(microsecond=0)
+
+            if tz_offset is None:
+                # Naive datetime: strip tz details completely
+                dt_naive = dt_utc.replace(tzinfo=None)
+                parts[0] = dt_naive.isoformat()
+            elif tz_offset == 0:
+                # Appended "Z" format for exact zero UTC offset
+                dt_naive = dt_utc.replace(tzinfo=None)
+                parts[0] = dt_naive.isoformat() + "Z"
+            else:
+                # Create a specific fixed timezone offset object
+                target_tz = timezone(timedelta(hours=tz_offset))
+                dt_adjusted = dt_utc.astimezone(target_tz)
+                parts[0] = dt_adjusted.isoformat()
+
         except (ValueError, IndexError):
             # Fallback if the first column is corrupted or empty
             pass
@@ -94,14 +111,31 @@ def convert_unix_to_iso(line, is_header=False):
 
 
 def main():
-    """Main execution loop to handle port discovery, automatic hardware reset,
+    """Main execution loop to handle argument parsing, port discovery, automatic hardware reset,
 
     command transmission, stream filtering, and TSV formatting.
 
-    Connects to the logger, triggers data transmission, strips raw preamble metadata,
-    removes whitespace, saves the data block beginning with 'UnixTime' as a TSV file,
-    and clips the stream at the first subsequent line without a comma.
+
+
+
     """
+    # Set up Command Line Argument Parsing
+    parser = argparse.ArgumentParser(description="Download and convert e360 Cave Pearl data logger data.")
+    parser.add_argument(
+        "--offset",
+        type=float,
+        default=None,
+        help="UTC hour offset designation (e.g., -5, 0, 3.5). Default is no timezone indication.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default=DEFAULT_OUTPUT_FILE,
+        help=f"Path/name of the output TSV file. Default is '{DEFAULT_OUTPUT_FILE}'.",
+    )
+    args = parser.parse_args()
+
     port = find_serial_port()
     if not port:
         print("[-] No compatible FT232, CH340, or CP2102 USB-serial adapter found.")
@@ -134,7 +168,7 @@ def main():
         csv_started = False
         saved_lines_count = 0
 
-        with open(OUTPUT_FILE, "w", encoding="utf-8", newline="") as f:
+        with open(args.output, "w", encoding="utf-8", newline="") as f:
             while True:
                 line = ser.readline().decode("utf-8", errors="ignore")
 
@@ -154,7 +188,7 @@ def main():
                     if clean_line.startswith("UnixTime"):
                         csv_started = True
                         # Process and write the updated header line
-                        converted_line = convert_unix_to_iso(clean_line, is_header=True)
+                        converted_line = convert_unix_to_iso(clean_line, tz_offset=args.offset, is_header=True)
                         f.write(converted_line + "\n")
                         f.flush()
                         saved_lines_count += 1
@@ -165,13 +199,11 @@ def main():
 
                 # Once data block started, identify the trailer by checking for the lack of a comma
                 if csv_started and "," not in clean_line:
-                    print(
-                        "\n[+] End of data block detected (First non-CSV line encountered)."
-                    )
+                    print("\n[+] End of data block detected (First non-CSV line encountered).")
                     break
 
                 # Process data row (convert first column and switch separator to tab)
-                converted_line = convert_unix_to_iso(clean_line, is_header=False)
+                converted_line = convert_unix_to_iso(clean_line, tz_offset=args.offset, is_header=False)
 
                 # Write valid filtered line
                 f.write(converted_line + "\n")
@@ -185,13 +217,9 @@ def main():
                 )
 
         if csv_started and saved_lines_count > 1:
-            print(
-                f"\n\n[+] Success! Filtered data with 'Date_time' saved to '{OUTPUT_FILE}'."
-            )
+            print(f"\n\n[+] Success! Filtered data with 'Date_time' saved to '{args.output}'.")
         else:
-            print(
-                "\n\n[-] Error: The 'UnixTime' marker was never found or data block was empty."
-            )
+            print("\n\n[-] Error: The 'UnixTime' marker was never found or data block was empty.")
 
     except serial.SerialException as e:
         print(f"\n[-] Serial error: {e}")
