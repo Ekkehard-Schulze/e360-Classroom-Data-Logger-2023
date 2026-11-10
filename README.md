@@ -18,6 +18,8 @@ The aim of this fork is to extend the logger's capabilities by adding support fo
 ### Sensor Compatibility
 **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the respective **TMP117** options in the code.
 
+---
+
 ### TMP117 / TMP119 Operation Modes
 To balance power efficiency with data quality, you can choose from three hardware averaging modes during setup:
 
@@ -48,7 +50,7 @@ The macros follow a specific naming convention:
 
 ### Code Configuration Example
 
-Here sensor #1 is activated without averging
+Here sensor #1 is activated without averaging
 
 // =============================================================================
 // SENSOR CONFIGURATION (TMP117 / TMP119)

@@ -87,6 +87,12 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 
 //#define readSi7051_Temp_2byte            // 2-bytes: used for NTC calibration - does not require a library, functions for si7051 at end of program
 
+// =============================================================================
+// SENSOR CONFIGURATION (TMP117 / TMP119)
+// Uncomment the required sensors to activate them.
+// Format: readTMP117_[Sensor_number_1-4]_[Averaging]_Temp_2byte
+// Numbers: 1, 2, 3, and correspond to I2C addresseses 0x48, 0x49, 0x4A, and 0x4B
+// =============================================================================
 
 #define readTMP117_1_Temp_2byte            // 2-bytes: 1st sensor  no averaging by es  20 ms active per read - does not require a library
 
