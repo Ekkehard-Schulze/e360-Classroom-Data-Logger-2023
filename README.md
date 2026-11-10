@@ -52,11 +52,11 @@ The macros follow a specific naming convention:
 
 Here sensor #1 is activated without averaging
 
-// =============================================================================
+// ========================================================
 // SENSOR CONFIGURATION (TMP117 / TMP119)
 // Uncomment the required sensors to activate them.
 // Format: readTMP117_[Sensor_1-4]_[Averaging]_Temp_2byte
-// =============================================================================
+// ========================================================
 
 #define readTMP117_1_Temp_2byte            // 2-bytes: 1st sensor  no averaging by es  20 ms active per read - does not require a library
 
