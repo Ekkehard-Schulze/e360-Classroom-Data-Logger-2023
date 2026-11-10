@@ -1276,11 +1276,11 @@ turnOffAllindicatorLEDs();
 #ifdef readTMP117_1_Temp_2byte
 // Triggers a One-Shot conversion with no averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 00 (no Averaging)
 I2Cwrite(TMP117_1_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00000000); 
 
 // Note: A single conversion takes ~15.5 ms. 
-// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// With no averaging, you must wait at least 15.5 ms 
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
 delay(20); // Wait safely for the 15.5ms hardware action to finish + 4.5 ms safety margin
@@ -1304,14 +1304,14 @@ delay(155); // Wait safely for the 124ms hardware loop to finish + 31 ms safety 
 #ifdef readTMP117_1_x64_Temp_2byte
 // Triggers a One-Shot conversion with 64x averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+// LSB: 0b01100000 -> Sets AVG[1:0] bits (bits 6:5)  to 11 (64x Averaging)
 I2Cwrite(TMP117_1_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b01100000); 
 
 // Note: A single conversion takes ~15.5 ms. 
-// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// With 64x averaging, you must wait at least 992 ms (15.5 ms * 64 
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
-delay(1300); // Wait safely for the 1000ms hardware loop to finish + 3ßß ms safety margin
+delay(1300); // Wait safely for the 1000ms hardware loop to finish + 300 ms safety margin
 
 #endif
 
@@ -1355,11 +1355,11 @@ Wire.endTransmission();
 #ifdef readTMP117_2_Temp_2byte
 // Triggers a One-Shot conversion with no averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+// LSB: 0b00000000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (no Averaging)
 I2Cwrite(TMP117_2_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00000000); 
 
 // Note: A single conversion takes ~15.5 ms. 
-// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// With no averaging, you must wait at least 15.5 ms
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
 delay(20); // Wait safely for the 15.5ms hardware action to finish + 4.5 ms safety margin
@@ -1383,14 +1383,14 @@ delay(155); // Wait safely for the 124ms hardware loop to finish + 31 ms safety 
 #ifdef readTMP117_2_x64_Temp_2byte
 // Triggers a One-Shot conversion with 64x averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+// LSB: 0b01100000 -> Sets AVG[1:0] bits (bits 6:5)  to 11 (64x Averaging)
 I2Cwrite(TMP117_2_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b01100000); 
 
 // Note: A single conversion takes ~15.5 ms. 
-// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// With 64x averaging, you must wait at least 992 ms (15.5 ms * 64) 
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
-delay(1300); // Wait safely for the 1000ms hardware loop to finish + 3ßß ms safety margin
+delay(1300); // Wait safely for the 1000ms hardware loop to finish + 300 ms safety margin
 
 #endif
 
@@ -1433,11 +1433,11 @@ Wire.endTransmission();
 #ifdef readTMP117_3_Temp_2byte
 // Triggers a One-Shot conversion with no averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+// LSB: 0b00000000 -> Sets AVG[1:0] bits (bits 6:5)  to 00 (no Averaging)
 I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00000000); 
 
 // Note: A single conversion takes ~15.5 ms. 
-// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// With no averaging, you must wait at least 15.5 ms
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
 delay(20); // Wait safely for the 15.5ms hardware action to finish + 4.5 ms safety margin
@@ -1461,14 +1461,14 @@ delay(155); // Wait safely for the 124ms hardware loop to finish + 31 ms safety 
 #ifdef readTMP117_3_x64_Temp_2byte
 // Triggers a One-Shot conversion with 64x averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+// LSB: 0b01100000 -> Sets AVG[1:0] bits (bits 6:5)  to 11 (64x Averaging)
 I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b01100000); 
 
 // Note: A single conversion takes ~15.5 ms. 
-// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// With 64x averaging, you must wait at least 992 ms (15.5 ms * 64) 
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
-delay(1300); // Wait safely for the 1000ms hardware loop to finish + 3ßß ms safety margin
+delay(1300); // Wait safely for the 1000ms hardware loop to finish + 300 ms safety margin
 
 #endif
 
@@ -1512,11 +1512,11 @@ Wire.endTransmission();
 #ifdef readTMP117_4_Temp_2byte
 // Triggers a One-Shot conversion with no averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+// LSB: 0b00000000 -> Sets AVG[1:0] bits (bits 6:5)  to 00 (no Averaging)
 I2Cwrite(TMP117_4_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b00000000); 
 
 // Note: A single conversion takes ~15.5 ms. 
-// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// With no averaging, you must wait at least 15.5 ms
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
 delay(20); // Wait safely for the 15.5ms hardware action to finish + 4.5 ms safety margin
@@ -1540,14 +1540,14 @@ delay(155); // Wait safely for the 124ms hardware loop to finish + 31 ms safety 
 #ifdef readTMP117_4_x64_Temp_2byte
 // Triggers a One-Shot conversion with 64x averaging enabled.
 // MSB: 0b00001100 -> Sets MOD[1:0] bits (bits 11:10) to 11 (One-Shot Mode)
-// LSB: 0b00100000 -> Sets AVG[1:0] bits (bits 6:5)  to 01 (8x Averaging)
+// LSB: 0b01100000 -> Sets AVG[1:0] bits (bits 6:5)  to 11 (64x Averaging)
 I2Cwrite(TMP117_4_ADDRESS, TMP117_Config_Reg, 0b00001100, 0b01100000); 
 
 // Note: A single conversion takes ~15.5 ms. 
-// With 8x averaging, you must wait at least 124 ms (15.5 ms * 8) 
+// With 64x averaging, you must wait at least 992 ms (15.5 ms * 64) 
 // or poll the Data_Ready (DRDY) bit before reading the temperature
 
-delay(1300); // Wait safely for the 1000ms hardware loop to finish + 3ßß ms safety margin
+delay(1300); // Wait safely for the 1000ms hardware loop to finish + 300 ms safety margin
 
 #endif
 
