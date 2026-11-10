@@ -359,13 +359,13 @@ uint16_t pinA3voltage=0;                      // stored as millivolts &  requrie
 #if (defined(readTMP117_3_Temp_2byte) && defined(readTMP117_3_x8_Temp_2byte)) || \
     (defined(readTMP117_3_Temp_2byte) && defined(readTMP117_3_x64_Temp_2byte)) || \
     (defined(readTMP117_3_x8_Temp_2byte) && defined(readTMP117_3_x64_Temp_2byte))
-#error "More than one TMP117_1 reading macro is defined!"
+#error "More than one TMP117_3 reading macro is defined!"
 #endif
 
 #if (defined(readTMP117_4_Temp_2byte) && defined(readTMP117_4_x8_Temp_2byte)) || \
     (defined(readTMP117_4_Temp_2byte) && defined(readTMP117_4_x64_Temp_2byte)) || \
     (defined(readTMP117_4_x8_Temp_2byte) && defined(readTMP117_4_x64_Temp_2byte))
-#error "More than one TMP117_2 reading macro is defined!"
+#error "More than one TMP117_4 reading macro is defined!"
 #endif
 
 #define TMP117_1_ADDRESS     0x48             // I2C address
