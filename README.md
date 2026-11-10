@@ -18,18 +18,6 @@ The aim of this fork is to extend the logger's capabilities by adding support fo
 ### Sensor Compatibility
 **TMP119 Users:** The TMP119 is entirely code-compatible with the TMP117. When configuring your hardware, uncomment the respective **TMP117** options in the code.
 
-### Multi-Sensor Support
-
-For the **TMP117 and TMP119**, you can deploy up to **four sensors simultaneously** on the same I2C bus using the addresses `0x48`, `0x49`, `0x4A`, and `0x4B`.
-
-Because the system does not feature auto-discovery, you must manually activate the required sensors in the source code. To do this, uncomment the appropriate `#define` statements, re-compile the project, and upload the new firmware.
-
-The macros follow a specific naming convention:
-`readTMP117_<sensor_number>_<averaging>_Temp_2byte`
-
-* **Sensor Numbers:** 1, 2, 3, and 4
-* **Corresponding I2C Addresses:** `0x48`, `0x49`, `0x4A`, and `0x4B`
-
 ### TMP117 / TMP119 Operation Modes
 To balance power efficiency with data quality, you can choose from three hardware averaging modes during setup:
 
@@ -42,6 +30,40 @@ To balance power efficiency with data quality, you can choose from three hardwar
 *💡 **Tip:** If your logger is running on a CR2032 coin cell for long-term deployment, **No Averaging** is recommended to maximize battery life.*
 
 ---
+
+
+### Multi-Sensor Support
+
+For the **TMP117 and TMP119**, you can deploy up to **four sensors simultaneously** on the same I2C bus using the addresses `0x48`, `0x49`, `0x4A`, and `0x4B`.
+
+Because the system does not feature auto-discovery, you must manually activate the required sensors in the source code. To do this, uncomment the appropriate `#define` statements, re-compile the project, and upload the new firmware.
+
+The macros follow a specific naming convention:
+`readTMP117_<sensor_number>_<averaging>_Temp_2byte`
+
+* **Sensor Numbers:** 1, 2, 3, and 4
+* **Corresponding I2C Addresses:** `0x48`, `0x49`, `0x4A`, and `0x4B`
+
+---
+
+### Code Configuration Example
+
+Here sensor #1 is activated without averging
+
+// =============================================================================
+// SENSOR CONFIGURATION (TMP117 / TMP119)
+// Uncomment the required sensors to activate them.
+// Format: readTMP117_[Sensor_1-4]_[Averaging]_Temp_2byte
+// =============================================================================
+
+#define readTMP117_1_Temp_2byte            // 2-bytes: 1st sensor  no averaging by es  20 ms active per read - does not require a library
+
+//#define readTMP117_1_x8_Temp_2byte         // 2-bytes: 1st sensor 8x averaging by es  300 ms active per read - does not require a library
+
+//#define readTMP117_1_x64_Temp_2byte        // 2-bytes: 1st sensor 64x averaging by es  1300 ms active per read - does not require a lib
+
+---
+
 ### Data Download Utility
 
 A convenient Python data download tool is available at `utility/e360_CavePearl_logger_data_download.py`. 
