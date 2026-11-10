@@ -20,7 +20,15 @@ The aim of this fork is to extend the logger's capabilities by adding support fo
 
 ### Multi-Sensor Support
 
-For TMP117 and TMP119, you can deploy up to **four sensors simultaneously** on the I2C bus using addresses `0x48`, `0x49`, `0x4A`, `0x4B`.
+For the **TMP117 and TMP119**, you can deploy up to **four sensors simultaneously** on the same I2C bus using the addresses `0x48`, `0x49`, `0x4A`, and `0x4B`.
+
+Because the system does not feature auto-discovery, you must manually activate the required sensors in the source code. To do this, uncomment the appropriate `#define` statements, re-compile the project, and upload the new firmware.
+
+The macros follow a specific naming convention:
+`readTMP117_<sensor_number>_<averaging>_Temp_2byte`
+
+* **Sensor Numbers:** 1, 2, 3, and 4
+* **Corresponding I2C Addresses:** `0x48`, `0x49`, `0x4A`, and `0x4B`
 
 ### TMP117 / TMP119 Operation Modes
 To balance power efficiency with data quality, you can choose from three hardware averaging modes during setup:
