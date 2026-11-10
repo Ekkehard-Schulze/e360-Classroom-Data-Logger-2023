@@ -154,12 +154,12 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 //#define OLED_64x32_SSD1306               // not a sensor, but enabled with define to include needed library - requires 1000uF rail cap to smooth noise from 1306 charge pump!
 
 // Default EEprom: 0x57 & 4096 here saves data into the 4k eeprom on the RTC module:
-#define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
-#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
+//#define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
+//#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
 
 // If saving to an external 32k I2C EEprom module like that shown on the blog page: 
-//#define EEpromI2Caddr 0x50
-//#define totalBytesOfStorage 32768
+#define EEpromI2Caddr 0x50
+#define totalBytesOfStorage 32768
 
 // NOTE: the Red LED on D13 gets used if BOTH of the following LED #define statements are commented out
 // r9_b10_g11_gnd12 matches the e360 EDU model from 2023 for the Pulse Width Modulation lab
@@ -834,7 +834,7 @@ Wire.beginTransmission(TMP117_1_ADDRESS);
   if (Wire.endTransmission() == 0) {
 	// shutdown 
 	I2Cwrite(TMP117_1_ADDRESS, TMP117_Config_Reg, 0b00000100, 0b00100000);
-	Serial.print(F("TMP117 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+	Serial.print(F("TMP117_1 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
   }
 #endif
 
@@ -843,7 +843,7 @@ Wire.beginTransmission(TMP117_2_ADDRESS);
   if (Wire.endTransmission() == 0) {
 	// shutdown 
 	I2Cwrite(TMP117_1_ADDRESS, TMP117_Config_Reg, 0b00000100, 0b00100000);
-	Serial.print(F("TMP117 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+	Serial.print(F("TMP117_2 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
   }
 #endif
 
@@ -852,7 +852,7 @@ Wire.beginTransmission(TMP117_3_ADDRESS);
   if (Wire.endTransmission() == 0) {
 	// shutdown 
 	I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00000100, 0b00100000);
-	Serial.print(F("TMP117 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+	Serial.print(F("TMP117 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
   }
 #endif
 
@@ -861,7 +861,7 @@ Wire.beginTransmission(TMP117_4_ADDRESS);
   if (Wire.endTransmission() == 0) {
 	// shutdown 
 	I2Cwrite(TMP117_3_ADDRESS, TMP117_Config_Reg, 0b00000100, 0b00100000);
-	Serial.print(F("TMP117 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+	Serial.print(F("TMP117 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
   }
 #endif
 
@@ -870,7 +870,7 @@ Wire.beginTransmission(ADT7420_ADDRESS);
   if (Wire.endTransmission() == 0) {
    // shutdown 
    adt7420_control(ADT7420_ADDRESS, ADT7420_16BIT_MODE_SHUTDOWN);
-   Serial.print(F("ADT7420 started"));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+   Serial.print(F("ADT7420 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
   }
 #endif
 
@@ -1349,7 +1349,7 @@ Wire.endTransmission();
     tmp117_1_datac = ((tmp117_1_data[0] << 8) | tmp117_1_data[1]); 
 
     // Convert to Celcius (7.8125 mC resolution)
-	Serial.print(F(", TMP1 temp: "));Serial.print(tmp117_1_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+	Serial.print(F(", TMP1[°C]: "));Serial.print(tmp117_1_datac * 0.0078125,2);Serial.flush();//print 3 decimals
   }
 // end read TMP117 -------------------
 #endif
@@ -1428,7 +1428,7 @@ Wire.endTransmission();
     tmp117_2_datac = ((tmp117_2_data[0] << 8) | tmp117_2_data[1]); 
 
     // Convert to Celcius (7.8125 mC resolution)
-	Serial.print(F(", TMP2 temp: "));Serial.print(tmp117_2_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+	Serial.print(F(", TMP2[°C]: "));Serial.print(tmp117_2_datac * 0.0078125,2);Serial.flush();//print 3 decimals
   }
 // end read TMP117 -------------------
 #endif
@@ -1506,7 +1506,7 @@ Wire.endTransmission();
     tmp117_3_datac = ((tmp117_3_data[0] << 8) | tmp117_3_data[1]); 
 
     // Convert to Celcius (7.8125 mC resolution)
-	Serial.print(F(", TMP3 temp: "));Serial.print(tmp117_3_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+	Serial.print(F(", TMP3[°C]: "));Serial.print(tmp117_3_datac * 0.0078125,2);Serial.flush();//print 3 decimals
   }
 // end read TMP117 -------------------
 #endif
@@ -1585,7 +1585,7 @@ Wire.endTransmission();
     tmp117_4_datac = ((tmp117_4_data[0] << 8) | tmp117_4_data[1]); 
 
     // Convert to Celcius (7.8125 mC resolution)
-	Serial.print(F(", TMP4 temp: "));Serial.print(tmp117_4_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+	Serial.print(F(", TMP4[°C]: "));Serial.print(tmp117_4_datac * 0.0078125,2);Serial.flush();//print 3 decimals
   }
 // end read TMP117 -------------------
 #endif
@@ -1626,7 +1626,7 @@ Wire.endTransmission();
 
     // Convert to Celcius (7.8125 mC resolution) and return
     //return datac*0.0078125; 
-	Serial.print(F(", ADT7420 temp: "));Serial.print(adt7420_datac * 0.0078125,2);Serial.flush();//print 3 decimals
+	Serial.print(F(", ADT7420[°C]: "));Serial.print(adt7420_datac * 0.0078125,2);Serial.flush();//print 2 decimals
   }
 
 // end ADT7420 -------------------
