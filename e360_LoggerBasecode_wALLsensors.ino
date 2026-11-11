@@ -3263,7 +3263,7 @@ if (!convertDataFlag){    // then output raw bytes exactly as read from eeprom [
       
       // Output with 1 decimal place (matches the 12-bit resolution limit) and a trailing comma
       Serial.print(celsius, 1); 
-      Serial.print(F(", "));
+      Serial.print(F(","));
     }
   }
 #endif
