@@ -118,8 +118,17 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 
 //#define readTMP117_4_x64_Temp_2byte        // 2-bytes: 4th sensor 64x averaging by es  1300 ms active per read - does not require a library
 
+// #define readADT7420_Temp_2byte            // 2-bytes: by es - does not require a library
 
-//#define readADT7420_Temp_2byte            // 2-bytes: by es - does not require a library
+// Set exactly ONE of these DS18B20 options to true. The others must be false.
+
+//#define use_1_DS18B20_temp_2bytes  // libraries needed: DallasTemperature, 1Wire, needs Vcc >= 3.0 V
+
+//#define use_2_DS18B20_temp_4bytes // libraries needed: DallasTemperature, 1Wire, needs Vcc >= 3.0 V
+
+//#define use_3_DS18B20_temp_6bytes // libraries needed: DallasTemperature, 1Wire, needs Vcc >= 3.0 V
+
+// ------------------------
 
 //#define readSht3x_Temp_2byte             // 2-bytes
 //#define readSht3x_Humidity_2byte         // 2-bytes
@@ -154,12 +163,12 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 //#define OLED_64x32_SSD1306               // not a sensor, but enabled with define to include needed library - requires 1000uF rail cap to smooth noise from 1306 charge pump!
 
 // Default EEprom: 0x57 & 4096 here saves data into the 4k eeprom on the RTC module:
-//#define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
-//#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
+#define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
+#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
 
 // If saving to an external 32k I2C EEprom module like that shown on the blog page: 
-#define EEpromI2Caddr 0x50
-#define totalBytesOfStorage 32768
+//#define EEpromI2Caddr 0x50
+//#define totalBytesOfStorage 32768
 
 // NOTE: the Red LED on D13 gets used if BOTH of the following LED #define statements are commented out
 // r9_b10_g11_gnd12 matches the e360 EDU model from 2023 for the Pulse Width Modulation lab
@@ -422,6 +431,43 @@ void adt7420_control (uint8_t i2caddr, uint8_t cvalue)
 #endif
 
 
+// Check that only one option is active
+#if (defined(use_1_DS18B20_temp_2bytes) && defined(use_2_DS18B20_temp_4bytes)) || \
+    (defined(use_1_DS18B20_temp_2bytes) && defined(use_3_DS18B20_temp_6bytes)) || \
+    (defined(use_2_DS18B20_temp_4bytes) && defined(use_3_DS18B20_temp_6bytes))
+  #error "CONFIGURATION ERROR: A maximum of ONE DS18B20 option may be active!"
+#endif
+
+// Automatic sensor count derivation based on the chosen option
+#if defined(use_1_DS18B20_temp_2bytes)
+  #define NUM_DS18B20 1
+#elif defined(use_2_DS18B20_temp_4bytes)
+  #define NUM_DS18B20 2
+#elif defined(use_3_DS18B20_temp_6bytes)
+  #define NUM_DS18B20 3
+#else
+  #define NUM_DS18B20 0
+#endif
+
+#if NUM_DS18B20 > 0
+  #define ANY_DS18B20_ACTIVE
+  #include <OneWire.h>
+  #include <DallasTemperature.h>
+  #define ONE_WIRE_BUS_PIN                 5  // The shared 1-Wire data pin, Pin5 is D5
+  
+  OneWire oneWire(ONE_WIRE_BUS_PIN);
+  DallasTemperature dsSensors(&oneWire);
+  
+  // Storage for the original unscaled 16-bit raw data from the sensors
+  int16_t dsRawTemperatures[NUM_DS18B20];
+  
+  // Device address array needed for robust index lookup in the loop
+  DeviceAddress sensorAddresses[NUM_DS18B20];
+#endif
+
+
+
+
 
 #ifdef OLED_64x32_SSD1306
 //------------------------------------------------------------------------------
@@ -542,6 +588,17 @@ void setup () {
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
   #endif
 
+  #ifdef use_1_DS18B20_temp_2bytes
+  sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
+  #endif
+
+  #ifdef use_2_DS18B20_temp_4bytes
+  sensorBytesPerRecord = sensorBytesPerRecord + 4;            // two-byte integer  
+  #endif
+
+  #ifdef use_3_DS18B20_temp_6bytes
+  sensorBytesPerRecord = sensorBytesPerRecord + 6;            // two-byte integer  
+  #endif
 
 
 // General Startup housekeeping: Set UNUSED digital pins to a known state at startup to reduce current & noise
@@ -875,7 +932,28 @@ Wire.beginTransmission(ADT7420_ADDRESS);
 #endif
 
 
-
+#ifdef ANY_DS18B20_ACTIVE   // init sensors
+  pinMode(ONE_WIRE_BUS_PIN, INPUT_PULLUP); // Ensure stable line state
+  dsSensors.begin();
+  dsSensors.setResolution(12); // Lock to 12-bit mode for maximum native precision (0.0625°C step size)
+  
+  // Discover hardware ROM addresses on the bus and initialize with safe defaults
+  for (int i = 0; i < NUM_DS18B20; i++) {
+    dsRawTemperatures[i] = DEVICE_DISCONNECTED_RAW;
+    
+    // Check if the sensor is physically connected and copy its ROM address
+    if (dsSensors.getAddress(sensorAddresses[i], i)) {
+      Serial.print(F("DS18B20_"));
+      Serial.print(i + 1);
+      Serial.print(F(" started "));
+    } else {
+      Serial.print(F("DS18B20_"));
+      Serial.print(i + 1);
+      Serial.print(F(" failed "));
+    }
+    Serial.flush();
+  }
+#endif
 
 
 #ifdef OLED_64x32_SSD1306       // using library:  https://github.com/greiman/SSD1306Ascii/blob/master/src/SSD1306Ascii.cpp
@@ -1633,6 +1711,35 @@ Wire.endTransmission();
 #endif
 
 
+  #ifdef ANY_DS18B20_ACTIVE
+    dsSensors.requestTemperatures(); // Global broadcast command to start conversion
+    
+    for (int i = 0; i < NUM_DS18B20; i++) {
+      // Pull the untouched 16-bit binary scratchpad register directly from the chip
+      int16_t rawTemp = dsSensors.getTemp(sensorAddresses[i]);
+      
+      // Fallback check against library disconnect flag (-7040)
+      if (rawTemp != DEVICE_DISCONNECTED_RAW) {
+        dsRawTemperatures[i] = rawTemp;
+        
+        // Live serial output for the successful measurement (with 1 decimal place)
+        Serial.print(F(", DS18B20_"));
+        Serial.print(i + 1);
+        Serial.print(F("[°C]: "));
+        Serial.print(dsSensors.rawToCelsius(rawTemp), 1);
+      } else {
+        dsRawTemperatures[i] = DEVICE_DISCONNECTED_RAW;
+        
+        // Live serial output in case of an error
+        Serial.print(F(", DS18B20_"));
+        Serial.print(i + 1);
+        Serial.print(F(" temp: NaN "));
+      }
+      Serial.flush();
+    }
+  #endif
+
+
 
 
 #ifdef PIRcountPerInterval_2byte
@@ -1957,6 +2064,30 @@ Wire.write(loByte);
 hiByte = highByte(uint16_Buffer);
 Wire.write(hiByte);
 #endif
+
+
+#ifdef ANY_DS18B20_ACTIVE
+  // Sequentially writes the raw data via I2C to the EEPROM for each active sensor
+  for (int i = 0; i < NUM_DS18B20; i++) {
+    
+    // Cast the signed 16-bit sensor value to an unsigned buffer
+    uint16_Buffer = (uint16_t)dsRawTemperatures[i];
+    
+    // 0xFF trap for data integrity (prevents misinterpretation of empty EEPROM memory)
+    if (uint16_Buffer == 65535) { 
+      uint16_Buffer = 65534; 
+    } 
+    
+    // Extract and send low byte
+    loByte = lowByte(uint16_Buffer);
+    Wire.write(loByte);
+    
+    // Extract and send high byte
+    hiByte = highByte(uint16_Buffer);
+    Wire.write(hiByte);
+  }
+#endif
+
 
 
 //-------------------------------------------------------------------------------
@@ -2561,10 +2692,25 @@ void startMenu_listEnabledSensors(){
 	    #endif		
   #if  defined(readTMP117_4_Temp_2byte) || defined(readTMP117_4_x8_Temp_2byte) || defined(readTMP117_4_x64_Temp_2byte) 
 	    Serial.print(F("TMP4[°C], "));
-	    #endif		
+	    #endif	
+
   #ifdef readADT7420_Temp_2byte
 	    Serial.print(F("ADT1[°C], "));
 	    #endif		
+
+// ============================================================================
+// SERIAL CSV HEADER GENERATION (Place in your print headers function)
+// ============================================================================
+
+#if defined(use_1_DS18B20_temp_2bytes) || defined(use_2_DS18B20_temp_4bytes) || defined(use_3_DS18B20_temp_6bytes)
+  for (int i = 1; i <= NUM_DS18B20; i++) {
+    Serial.print(F("DS18B20_"));
+    Serial.print(i);
+    Serial.print(F("[°C], "));
+  }
+#endif
+
+
   #ifdef PIRtriggersReadings_4byte
         Serial.print(F("PIRtrigger = Variable Runtime!"));
         #endif
@@ -3091,6 +3237,35 @@ if (!convertDataFlag){    // then output raw bytes exactly as read from eeprom [
 		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
 		int16_Buffer = (int16_t)((hiByte << 8) | loByte);
 		Serial.print(int16_Buffer * 0.0078125,2);Serial.print(F(",")); 		
+#endif
+// ============================================================================
+// 6. SERIAL DATA OUTPUT & EEPROM UNPACKING (Place in your data dump function)
+// ============================================================================
+
+#ifdef ANY_DS18B20_ACTIVE
+  for (int i = 0; i < NUM_DS18B20; i++) {
+    // Reads the two consecutive bytes via the I2C EEPROM function
+    loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+    hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+    
+    // Reconstruct 16-bit word as an unsigned value (for the 0xFF trap check)
+    uint16_t packedTemp = (uint16_t)((hiByte << 8) | loByte);
+    
+    if (packedTemp >= 65534) {
+      // Output NaN if the data point is empty (0xFF) or invalid
+      Serial.print(F("NaN, "));
+    } else {
+      // Cast to the native signed int16_t buffer for proper sign handling
+      int16_Buffer = (int16_t)packedTemp;
+      
+      // Precisely converts the original raw data into Celsius
+      float celsius = dsSensors.rawToCelsius(int16_Buffer);
+      
+      // Output with 1 decimal place (matches the 12-bit resolution limit) and a trailing comma
+      Serial.print(celsius, 1); 
+      Serial.print(F(", "));
+    }
+  }
 #endif
 
 
