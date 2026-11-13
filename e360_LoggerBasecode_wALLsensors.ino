@@ -134,6 +134,10 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 
 //#define use_3_DS18B20_temp_6bytes // libraries needed: DallasTemperature, 1Wire, needs Vcc >= 3.0 V
 
+//#define use_4_DS18B20_temp_8bytes // libraries needed: DallasTemperature, 1Wire, needs Vcc >= 3.0 V
+
+//#define use_dummy_2bytes  // for eeprom alignment padding
+
 // ------------------------
 
 //#define readSht3x_Temp_2byte             // 2-bytes
@@ -169,12 +173,12 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 //#define OLED_64x32_SSD1306               // not a sensor, but enabled with define to include needed library - requires 1000uF rail cap to smooth noise from 1306 charge pump!
 
 // Default EEprom: 0x57 & 4096 here saves data into the 4k eeprom on the RTC module:
-#define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
-#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module ////
+//#define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
+//#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
 
 // If saving to an external 32k I2C EEprom module like that shown on the blog page: 
-//#define EEpromI2Caddr 0x50
-//#define totalBytesOfStorage 32768
+#define EEpromI2Caddr 0x50
+#define totalBytesOfStorage 32768
 
 // NOTE: the Red LED on D13 gets used if BOTH of the following LED #define statements are commented out
 // r9_b10_g11_gnd12 matches the e360 EDU model from 2023 for the Pulse Width Modulation lab
@@ -435,10 +439,11 @@ void adt7420_control (uint8_t i2caddr, uint8_t cvalue)
 
 
 #if  defined(use_1_DS18B20_temp_2bytes) || defined(use_2_DS18B20_temp_4bytes) || \
-defined(use_3_DS18B20_temp_6bytes) 
+defined(use_3_DS18B20_temp_6bytes) || defined(use_4_DS18B20_temp_8bytes)
 
 	#if (defined(use_1_DS18B20_temp_2bytes) + \
 		 defined(use_2_DS18B20_temp_4bytes) + \
+		 defined(use_4_DS18B20_temp_8bytes) + \		 
 		 defined(use_3_DS18B20_temp_6bytes)) != 1
 	  #error "CONFIGURATION ERROR: Exactly ONE DS18B20 option must be active!"
 	#endif
@@ -450,6 +455,11 @@ defined(use_3_DS18B20_temp_6bytes)
 	  #define NUM_DS18B20 2
 	#elif defined(use_3_DS18B20_temp_6bytes)
 	  #define NUM_DS18B20 3
+	#elif defined(use_4_DS18B20_temp_8bytes)
+	  #define NUM_DS18B20 4
+	#else
+	  #define NUM_DS18B20 0 // Default fallback if no sensor macro is defined
+	#endif
 
   #define ANY_DS18B20_ACTIVE
   #include <OneWire.h>
@@ -612,6 +622,15 @@ void setup () {
   #ifdef use_3_DS18B20_temp_6bytes
   sensorBytesPerRecord = sensorBytesPerRecord + 6;            // two-byte integer  
   #endif
+
+  #ifdef use_4_DS18B20_temp_8bytes
+  sensorBytesPerRecord = sensorBytesPerRecord + 8;            // two-byte integer  
+  #endif
+
+  #ifdef use_dummy_2bytes
+  sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte padding 
+  #endif
+
 
 
 // General Startup housekeeping: Set UNUSED digital pins to a known state at startup to reduce current & noise
@@ -2285,6 +2304,10 @@ Wire.write(hiByte);
   }
 #endif
 
+#ifdef use_dummy_2bytes
+    Wire.write(0x6E);
+    Wire.write(0x6E);
+#endif
 
 
 //-------------------------------------------------------------------------------
@@ -3501,6 +3524,12 @@ if (!convertDataFlag){    // then output raw bytes exactly as read from eeprom [
     }
   }
 #endif
+
+#ifdef use_dummy_2bytes
+EEmemPointer++;
+EEmemPointer++;
+#endif
+
 
 
   } //terminators if(convertDataFlag)
