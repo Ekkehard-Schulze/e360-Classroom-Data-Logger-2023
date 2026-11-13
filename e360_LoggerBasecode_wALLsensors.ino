@@ -94,31 +94,37 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 // Numbers: 1, 2, 3, and correspond to I2C addresseses 0x48, 0x49, 0x4A, and 0x4B
 // =============================================================================
 
-#define readTMP117_1_Temp_2byte            // 2-bytes: 1st sensor  no averaging by es  20 ms active per read - does not require a library
+#define readTMP117_1_Temp_2byte            // 2-bytes: 1st sensor  no averaging  20 ms active per read - does not require a library
 
-//#define readTMP117_1_x8_Temp_2byte         // 2-bytes: 1st sensor 8x averaging by es  300 ms active per read - does not require a library
+//#define readTMP117_1_x8_Temp_2byte         // 2-bytes: 1st sensor 8x averaging  300 ms active per read - does not require a library
 
-//#define readTMP117_1_x64_Temp_2byte        // 2-bytes: 1st sensor 64x averaging by es  1300 ms active per read - does not require a library
+//#define readTMP117_1_x64_Temp_2byte        // 2-bytes: 1st sensor 64x averaging  1300 ms active per read - does not require a library
 
-//#define readTMP117_2_Temp_2byte            // 2-bytes: 2nd sensor no averaging by es  20 ms active per read - does not require a library
+//#define readTMP117_2_Temp_2byte            // 2-bytes: 2nd sensor no averaging  20 ms active per read - does not require a library
 
-//#define readTMP117_2_x8_Temp_2byte         // 2-bytes: 2nd sensor 8x averaging by es  300 ms active per read - does not require a library
+//#define readTMP117_2_x8_Temp_2byte         // 2-bytes: 2nd sensor 8x averaging  300 ms active per read - does not require a library
 
-//#define readTMP117_2_x64_Temp_2byte        // 2-bytes: 2nd sensor 64x averaging by es  1300 ms active per read - does not require a library
+//#define readTMP117_2_x64_Temp_2byte        // 2-bytes: 2nd sensor 64x averaging  1300 ms active per read - does not require a library
 
-//#define readTMP117_3_Temp_2byte            // 2-bytes: 3rd sensor  no averaging by es  20 ms active per read - does not require a library
+//#define readTMP117_3_Temp_2byte            // 2-bytes: 3rd sensor  no averaging  20 ms active per read - does not require a library
 
-//#define readTMP117_3_x8_Temp_2byte         // 2-bytes: 3rd sensor 8x averaging by es  300 ms active per read - does not require a library
+//#define readTMP117_3_x8_Temp_2byte         // 2-bytes: 3rd sensor 8x averaging  300 ms active per read - does not require a library
 
-//#define readTMP117_3_x64_Temp_2byte        // 2-bytes: 3rd sensor 64x averaging by es  1300 ms active per read - does not require a library
+//#define readTMP117_3_x64_Temp_2byte        // 2-bytes: 3rd sensor 64x averaging  1300 ms active per read - does not require a library
 
-//#define readTMP117_4_Temp_2byte            // 2-bytes: 4th sensor no averaging by es  20 ms active per read - does not require a library
+//#define readTMP117_4_Temp_2byte            // 2-bytes: 4th sensor no averaging  20 ms active per read - does not require a library
 
-//#define readTMP117_4_x8_Temp_2byte         // 2-bytes: 4th sensor 8x averaging by es  300 ms active per read - does not require a library
+//#define readTMP117_4_x8_Temp_2byte         // 2-bytes: 4th sensor 8x averaging  300 ms active per read - does not require a library
 
-//#define readTMP117_4_x64_Temp_2byte        // 2-bytes: 4th sensor 64x averaging by es  1300 ms active per read - does not require a library
+//#define readTMP117_4_x64_Temp_2byte        // 2-bytes: 4th sensor 64x averaging  1300 ms active per read - does not require a library
 
-// #define readADT7420_Temp_2byte            // 2-bytes: by es - does not require a library
+// #define readADT7420_1_Temp_2byte            // 2-bytes: - does not require a library
+
+// #define readADT7420_2_Temp_2byte            // 2-bytes: - does not require a library
+
+// #define readADT7420_3_Temp_2byte            // 2-bytes: - does not require a library
+
+// #define readADT7420_4_Temp_2byte            // 2-bytes: - does not require a library
 
 // Set exactly ONE of these DS18B20 options to true. The others must be false.
 
@@ -164,7 +170,7 @@ Note: we still have upper 512 bytes of 328p 1k eeprom availible for OLED screen 
 
 // Default EEprom: 0x57 & 4096 here saves data into the 4k eeprom on the RTC module:
 #define EEpromI2Caddr 0x57                    // Run a bus scanner to check where your eeproms are https://github.com/RobTillaart/MultiSpeedI2CScanner
-#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module 
+#define totalBytesOfStorage 4096              // Default: 0x57 / 4096bytes to use the 4k eeprom on the RTC module ////
 
 // If saving to an external 32k I2C EEprom module like that shown on the blog page: 
 //#define EEpromI2Caddr 0x50
@@ -399,11 +405,15 @@ double I2Cwrite(int dev, int reg, int H, int L){
 #endif
 
 
-#ifdef readADT7420_Temp_2byte
+#if  defined(readADT7420_1_Temp_2byte) ||  defined(readADT7420_2_Temp_2byte) || \
+defined(readADT7420_3_Temp_2byte) || defined(readADT7420_4_Temp_2byte)
 
 // ADT7420 definitions and helpers
 
-#define ADT7420_ADDRESS     0x48             // I2C address of sensor, 0x48, 0x49, 0x4A, 0x4B
+#define ADT7420_1_ADDRESS     0x48             // I2C address of sensor
+#define ADT7420_2_ADDRESS     0x49             // I2C address of sensor
+#define ADT7420_3_ADDRESS     0x4A             // I2C address of sensor
+#define ADT7420_4_ADDRESS     0x4B             // I2C address of sensor
 
 
 // ADT7420 Register-Adressen
@@ -413,13 +423,6 @@ double I2Cwrite(int dev, int reg, int H, int L){
 // Konfigurations-Bytes (16-Bit-Modus über Bit 7 = 1)
 #define ADT7420_16BIT_MODE_SHUTDOWN 0b11100000 // (Bit 7 = 1, Bits [6:5] = 11)
 #define ADT7420_16BIT_MODE_ONESHOT  0x10100000 // (Bit 7 = 1, Bits [6:5] = 01)
-
-float adt7420_float;
-short adt7420_short;
-
-#define ARRAY_SIZE_ADT7420 2 // Maximum size of the buffer
-#define REQUEST_ADT7420 2 //number of bytes to REQUEST_ADT7420 at a time from I2C
-
 
 void adt7420_control (uint8_t i2caddr, uint8_t cvalue)
     {
@@ -431,25 +434,23 @@ void adt7420_control (uint8_t i2caddr, uint8_t cvalue)
 #endif
 
 
-// Check that only one option is active
-#if (defined(use_1_DS18B20_temp_2bytes) && defined(use_2_DS18B20_temp_4bytes)) || \
-    (defined(use_1_DS18B20_temp_2bytes) && defined(use_3_DS18B20_temp_6bytes)) || \
-    (defined(use_2_DS18B20_temp_4bytes) && defined(use_3_DS18B20_temp_6bytes))
-  #error "CONFIGURATION ERROR: A maximum of ONE DS18B20 option may be active!"
-#endif
+#if  defined(use_1_DS18B20_temp_2bytes) || defined(use_2_DS18B20_temp_4bytes) || \
+defined(use_3_DS18B20_temp_6bytes) 
 
-// Automatic sensor count derivation based on the chosen option
-#if defined(use_1_DS18B20_temp_2bytes)
-  #define NUM_DS18B20 1
-#elif defined(use_2_DS18B20_temp_4bytes)
-  #define NUM_DS18B20 2
-#elif defined(use_3_DS18B20_temp_6bytes)
-  #define NUM_DS18B20 3
-#else
-  #define NUM_DS18B20 0
-#endif
+	#if (defined(use_1_DS18B20_temp_2bytes) + \
+		 defined(use_2_DS18B20_temp_4bytes) + \
+		 defined(use_3_DS18B20_temp_6bytes)) != 1
+	  #error "CONFIGURATION ERROR: Exactly ONE DS18B20 option must be active!"
+	#endif
 
-#if NUM_DS18B20 > 0
+	// Automatic sensor count derivation based on the chosen option
+	#if defined(use_1_DS18B20_temp_2bytes)
+	  #define NUM_DS18B20 1
+	#elif defined(use_2_DS18B20_temp_4bytes)
+	  #define NUM_DS18B20 2
+	#elif defined(use_3_DS18B20_temp_6bytes)
+	  #define NUM_DS18B20 3
+
   #define ANY_DS18B20_ACTIVE
   #include <OneWire.h>
   #include <DallasTemperature.h>
@@ -584,7 +585,19 @@ void setup () {
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
   #endif  
 
-  #ifdef readADT7420_Temp_2byte
+  #ifdef readADT7420_1_Temp_2byte
+    sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
+  #endif
+
+  #ifdef readADT7420_2_Temp_2byte
+    sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
+  #endif
+
+  #ifdef readADT7420_3_Temp_2byte
+    sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
+  #endif
+
+  #ifdef readADT7420_4_Temp_2byte
     sensorBytesPerRecord = sensorBytesPerRecord + 2;            // two-byte integer  
   #endif
 
@@ -922,14 +935,42 @@ Wire.beginTransmission(TMP117_4_ADDRESS);
   }
 #endif
 
-#ifdef readADT7420_Temp_2byte  // init Sensor
-Wire.beginTransmission(ADT7420_ADDRESS);
+#ifdef readADT7420_1_Temp_2byte  // init Sensor
+Wire.beginTransmission(ADT7420_1_ADDRESS);
   if (Wire.endTransmission() == 0) {
    // shutdown 
-   adt7420_control(ADT7420_ADDRESS, ADT7420_16BIT_MODE_SHUTDOWN);
-   Serial.print(F("ADT7420 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+   adt7420_control(ADT7420_1_ADDRESS, ADT7420_16BIT_MODE_SHUTDOWN);
+   Serial.print(F("ADT7420_1 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
   }
 #endif
+
+#ifdef readADT7420_2_Temp_2byte  // init Sensor
+Wire.beginTransmission(ADT7420_2_ADDRESS);
+  if (Wire.endTransmission() == 0) {
+   // shutdown 
+   adt7420_control(ADT7420_2_ADDRESS, ADT7420_16BIT_MODE_SHUTDOWN);
+   Serial.print(F("ADT7420_2 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+  }
+#endif
+
+#ifdef readADT7420_3_Temp_2byte  // init Sensor
+Wire.beginTransmission(ADT7420_3_ADDRESS);
+  if (Wire.endTransmission() == 0) {
+   // shutdown 
+   adt7420_control(ADT7420_3_ADDRESS, ADT7420_16BIT_MODE_SHUTDOWN);
+   Serial.print(F("ADT7420_3 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+  }
+#endif
+
+#ifdef readADT7420_4_Temp_2byte  // init Sensor
+Wire.beginTransmission(ADT7420_4_ADDRESS);
+  if (Wire.endTransmission() == 0) {
+   // shutdown 
+   adt7420_control(ADT7420_4_ADDRESS, ADT7420_16BIT_MODE_SHUTDOWN);
+   Serial.print(F("ADT7420_4 started "));Serial.flush();  // if you see this message in the serial monitor you know the sensor did not hang the machine...	
+  }
+#endif
+
 
 
 #ifdef ANY_DS18B20_ACTIVE   // init sensors
@@ -1669,15 +1710,15 @@ Wire.endTransmission();
 #endif
 
 
-#ifdef readADT7420_Temp_2byte // read and print 
+#ifdef readADT7420_1_Temp_2byte // read and print 
 
-adt7420_control(ADT7420_ADDRESS, ADT7420_16BIT_MODE_ONESHOT);
+adt7420_control(ADT7420_1_ADDRESS, ADT7420_16BIT_MODE_ONESHOT);
 
 delay(300); // conversion time 16-bit is 240 ms, + 60 ms safety margin
 
 // read sensor
 // Points to device & begins transmission
-Wire.beginTransmission(ADT7420_ADDRESS); 
+Wire.beginTransmission(ADT7420_1_ADDRESS); 
 // Points to temperature register to read/write data
 Wire.write(ADT7420_REG_TEMP_H); 
 // Ends data transfer and transmits data from register
@@ -1686,25 +1727,148 @@ Wire.endTransmission();
 // delay(10);
 
   // Data array to store 2-bytes from I2C line
-  uint8_t adt7420_data[2]; 
+  uint8_t adt7420_1_data[2]; 
   // Combination of 2-byte data into 16-bit data
-  int16_t adt7420_datac;     
+  int16_t adt7420_1_datac;     
 
   // Requests 2-byte temperature data from device
-  Wire.requestFrom(ADT7420_ADDRESS,2); 
+  Wire.requestFrom(ADT7420_1_ADDRESS,2); 
 
   // Checks if data received matches the requested 2-bytes
   if(Wire.available() <= 2){  
     // Stores each byte of data from temperature register
-    adt7420_data[0] = Wire.read(); 
-    adt7420_data[1] = Wire.read(); 
+    adt7420_1_data[0] = Wire.read(); 
+    adt7420_1_data[1] = Wire.read(); 
 
     // Combines data to make 16-bit binary number
-    adt7420_datac = ((adt7420_data[0] << 8) | adt7420_data[1]); 
+    adt7420_1_datac = ((adt7420_1_data[0] << 8) | adt7420_1_data[1]); 
 
     // Convert to Celcius (7.8125 mC resolution) and return
     //return datac*0.0078125; 
-	Serial.print(F(", ADT7420[°C]: "));Serial.print(adt7420_datac * 0.0078125,2);Serial.flush();//print 2 decimals
+	Serial.print(F(", ADT7420[°C]: "));Serial.print(adt7420_1_datac * 0.0078125,2);Serial.flush();//print 2 decimals
+  }
+
+// end ADT7420 -------------------
+#endif
+
+#ifdef readADT7420_2_Temp_2byte // read and print 
+
+adt7420_control(ADT7420_2_ADDRESS, ADT7420_16BIT_MODE_ONESHOT);
+
+delay(300); // conversion time 16-bit is 240 ms, + 60 ms safety margin
+
+// read sensor
+// Points to device & begins transmission
+Wire.beginTransmission(ADT7420_2_ADDRESS); 
+// Points to temperature register to read/write data
+Wire.write(ADT7420_REG_TEMP_H); 
+// Ends data transfer and transmits data from register
+Wire.endTransmission(); 
+// Delay to allow sufficient conversion time, is done after the calling loop
+// delay(10);
+
+  // Data array to store 2-bytes from I2C line
+  uint8_t adt7420_2_data[2]; 
+  // Combination of 2-byte data into 16-bit data
+  int16_t adt7420_2_datac;     
+
+  // Requests 2-byte temperature data from device
+  Wire.requestFrom(ADT7420_2_ADDRESS,2); 
+
+  // Checks if data received matches the requested 2-bytes
+  if(Wire.available() <= 2){  
+    // Stores each byte of data from temperature register
+    adt7420_2_data[0] = Wire.read(); 
+    adt7420_2_data[1] = Wire.read(); 
+
+    // Combines data to make 16-bit binary number
+    adt7420_2_datac = ((adt7420_2_data[0] << 8) | adt7420_2_data[1]); 
+
+    // Convert to Celcius (7.8125 mC resolution) and return
+    //return datac*0.0078125; 
+	Serial.print(F(", ADT7420[°C]: "));Serial.print(adt7420_2_datac * 0.0078125,2);Serial.flush();//print 2 decimals
+  }
+
+// end ADT7420 -------------------
+#endif
+
+#ifdef readADT7420_3_Temp_2byte // read and print 
+
+adt7420_control(ADT7420_3_ADDRESS, ADT7420_16BIT_MODE_ONESHOT);
+
+delay(300); // conversion time 16-bit is 240 ms, + 60 ms safety margin
+
+// read sensor
+// Points to device & begins transmission
+Wire.beginTransmission(ADT7420_3_ADDRESS); 
+// Points to temperature register to read/write data
+Wire.write(ADT7420_REG_TEMP_H); 
+// Ends data transfer and transmits data from register
+Wire.endTransmission(); 
+// Delay to allow sufficient conversion time, is done after the calling loop
+// delay(10);
+
+  // Data array to store 2-bytes from I2C line
+  uint8_t adt7420_3_data[2]; 
+  // Combination of 2-byte data into 16-bit data
+  int16_t adt7420_3_datac;     
+
+  // Requests 2-byte temperature data from device
+  Wire.requestFrom(ADT7420_3_ADDRESS,2); 
+
+  // Checks if data received matches the requested 2-bytes
+  if(Wire.available() <= 2){  
+    // Stores each byte of data from temperature register
+    adt7420_3_data[0] = Wire.read(); 
+    adt7420_3_data[1] = Wire.read(); 
+
+    // Combines data to make 16-bit binary number
+    adt7420_3_datac = ((adt7420_3_data[0] << 8) | adt7420_3_data[1]); 
+
+    // Convert to Celcius (7.8125 mC resolution) and return
+    //return datac*0.0078125; 
+	Serial.print(F(", ADT7420[°C]: "));Serial.print(adt7420_3_datac * 0.0078125,2);Serial.flush();//print 2 decimals
+  }
+
+// end ADT7420 -------------------
+#endif
+
+#ifdef readADT7420_4_Temp_2byte // read and print 
+
+adt7420_control(ADT7420_4_ADDRESS, ADT7420_16BIT_MODE_ONESHOT);
+
+delay(300); // conversion time 16-bit is 240 ms, + 60 ms safety margin
+
+// read sensor
+// Points to device & begins transmission
+Wire.beginTransmission(ADT7420_4_ADDRESS); 
+// Points to temperature register to read/write data
+Wire.write(ADT7420_REG_TEMP_H); 
+// Ends data transfer and transmits data from register
+Wire.endTransmission(); 
+// Delay to allow sufficient conversion time, is done after the calling loop
+// delay(10);
+
+  // Data array to store 2-bytes from I2C line
+  uint8_t adt7420_4_data[2]; 
+  // Combination of 2-byte data into 16-bit data
+  int16_t adt7420_4_datac;     
+
+  // Requests 2-byte temperature data from device
+  Wire.requestFrom(ADT7420_4_ADDRESS,2); 
+
+  // Checks if data received matches the requested 2-bytes
+  if(Wire.available() <= 2){  
+    // Stores each byte of data from temperature register
+    adt7420_4_data[0] = Wire.read(); 
+    adt7420_4_data[1] = Wire.read(); 
+
+    // Combines data to make 16-bit binary number
+    adt7420_4_datac = ((adt7420_4_data[0] << 8) | adt7420_4_data[1]); 
+
+    // Convert to Celcius (7.8125 mC resolution) and return
+    //return datac*0.0078125; 
+	Serial.print(F(", ADT7420[°C]: "));Serial.print(adt7420_4_datac * 0.0078125,2);Serial.flush();//print 2 decimals
   }
 
 // end ADT7420 -------------------
@@ -2055,9 +2219,42 @@ hiByte = highByte(uint16_Buffer);
 Wire.write(hiByte);
 #endif
 
-#ifdef readADT7420_Temp_2byte
+#ifdef readADT7420_1_Temp_2byte
 // ------------ prepare eeprom data for ADT7420 -----------------------
-uint16_Buffer = (uint16_t)adt7420_datac;
+uint16_Buffer = (uint16_t)adt7420_1_datac;
+if(uint16_Buffer == 65535){ uint16_Buffer = 65534; } // 0xFF Trap zur Datensicherheit
+loByte = lowByte(uint16_Buffer);
+Wire.write(loByte);
+hiByte = highByte(uint16_Buffer);
+Wire.write(hiByte);
+#endif
+
+
+#ifdef readADT7420_2_Temp_2byte
+// ------------ prepare eeprom data for ADT7420 -----------------------
+uint16_Buffer = (uint16_t)adt7420_2_datac;
+if(uint16_Buffer == 65535){ uint16_Buffer = 65534; } // 0xFF Trap zur Datensicherheit
+loByte = lowByte(uint16_Buffer);
+Wire.write(loByte);
+hiByte = highByte(uint16_Buffer);
+Wire.write(hiByte);
+#endif
+
+
+#ifdef readADT7420_3_Temp_2byte
+// ------------ prepare eeprom data for ADT7420 -----------------------
+uint16_Buffer = (uint16_t)adt7420_3_datac;
+if(uint16_Buffer == 65535){ uint16_Buffer = 65534; } // 0xFF Trap zur Datensicherheit
+loByte = lowByte(uint16_Buffer);
+Wire.write(loByte);
+hiByte = highByte(uint16_Buffer);
+Wire.write(hiByte);
+#endif
+
+
+#ifdef readADT7420_4_Temp_2byte
+// ------------ prepare eeprom data for ADT7420 -----------------------
+uint16_Buffer = (uint16_t)adt7420_4_datac;
 if(uint16_Buffer == 65535){ uint16_Buffer = 65534; } // 0xFF Trap zur Datensicherheit
 loByte = lowByte(uint16_Buffer);
 Wire.write(loByte);
@@ -2694,15 +2891,27 @@ void startMenu_listEnabledSensors(){
 	    Serial.print(F("TMP4[°C], "));
 	    #endif	
 
-  #ifdef readADT7420_Temp_2byte
+  #ifdef readADT7420_1_Temp_2byte
 	    Serial.print(F("ADT1[°C], "));
+	    #endif		
+
+  #ifdef readADT7420_2_Temp_2byte
+	    Serial.print(F("ADT2[°C], "));
+	    #endif		
+
+  #ifdef readADT7420_3_Temp_2byte
+	    Serial.print(F("ADT3[°C], "));
+	    #endif		
+
+  #ifdef readADT7420_4_Temp_2byte
+	    Serial.print(F("ADT4[°C], "));
 	    #endif		
 
 // ============================================================================
 // SERIAL CSV HEADER GENERATION (Place in your print headers function)
 // ============================================================================
 
-#if defined(use_1_DS18B20_temp_2bytes) || defined(use_2_DS18B20_temp_4bytes) || defined(use_3_DS18B20_temp_6bytes)
+#ifdef ANY_DS18B20_ACTIVE
   for (int i = 1; i <= NUM_DS18B20; i++) {
     Serial.print(F("DS18B20_"));
     Serial.print(i);
@@ -3232,12 +3441,37 @@ if (!convertDataFlag){    // then output raw bytes exactly as read from eeprom [
 		Serial.print(int16_Buffer * 0.0078125,2);Serial.print(F(",")); 		
 #endif
 
-#ifdef readADT7420_Temp_2byte
+#ifdef readADT7420_1_Temp_2byte
 		loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
 		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
 		int16_Buffer = (int16_t)((hiByte << 8) | loByte);
 		Serial.print(int16_Buffer * 0.0078125,2);Serial.print(F(",")); 		
 #endif
+
+#ifdef readADT7420_2_Temp_2byte
+		loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		int16_Buffer = (int16_t)((hiByte << 8) | loByte);
+		Serial.print(int16_Buffer * 0.0078125,2);Serial.print(F(",")); 		
+#endif
+
+#ifdef readADT7420_3_Temp_2byte
+		loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		int16_Buffer = (int16_t)((hiByte << 8) | loByte);
+		Serial.print(int16_Buffer * 0.0078125,2);Serial.print(F(",")); 		
+#endif
+
+#ifdef readADT7420_4_Temp_2byte
+		loByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		hiByte = i2c_eeprom_read_byte(EEpromI2Caddr, EEmemPointer); EEmemPointer++;
+		int16_Buffer = (int16_t)((hiByte << 8) | loByte);
+		Serial.print(int16_Buffer * 0.0078125,2);Serial.print(F(",")); 		
+#endif
+
+
+
+
 // ============================================================================
 // 6. SERIAL DATA OUTPUT & EEPROM UNPACKING (Place in your data dump function)
 // ============================================================================
